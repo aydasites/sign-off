@@ -7,17 +7,16 @@
 <style>
   :root {
     /* HYBRID SAAS / TACTICAL THEME */
-    --bg-page: #0B1121; /* Deep slate, almost black */
-    --bg-card: #1E293B; /* Dark blue/grey slate */
-    --border: #334155; /* Subtle separation lines */
+    --bg-page: #0B1121;
+    --bg-card: #1E293B;
+    --border: #334155;
     
-    --text-main: #F8FAFC; /* Bright white for primary text */
-    --text-body: #CBD5E1; /* Soft grey for reading */
-    --text-muted: #94A3B8; /* Muted telemetry text */
+    --text-main: #F8FAFC;
+    --text-body: #CBD5E1;
+    --text-muted: #94A3B8;
     
-    /* UI Accents */
-    --accent-blue: #3B82F6; /* Corporate/Digital Blue */
-    --accent-red: #DC2626; /* Lethal/Danger Red */
+    --accent-blue: #3B82F6;
+    --accent-red: #DC2626;
     --accent-red-dim: rgba(239, 68, 68, 0.1);
     --accent-red-text: #FCA5A5;
     
@@ -34,6 +33,7 @@
     font-family: var(--font-sans);
     min-height: 100vh;
     line-height: 1.6;
+    user-select: none; /* Prevents text selection during hold interactions */
   }
   
   #app {
@@ -130,14 +130,6 @@
   button:disabled { opacity: 0.5; cursor: not-allowed; }
   
   /* Action-specific button styling */
-  button[data-action="engage"] {
-    background: var(--accent-red);
-    color: white;
-    border-color: var(--accent-red);
-    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
-  }
-  button[data-action="engage"]:hover:not(:disabled) { background: #B91C1C; }
-  
   button[data-action="verify"] {
     background: var(--accent-blue);
     color: white;
@@ -173,6 +165,30 @@
   
   .restart { text-align: center; margin-top: 20px; }
   .restart:hover { background: var(--border); }
+
+  /* Hold-to-Authorize Button Mechanic */
+  .hold-btn { 
+    position: relative; 
+    overflow: hidden; 
+    background: var(--accent-red);
+    color: white;
+    border-color: var(--accent-red);
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+    -webkit-touch-callout: none;
+  }
+  .hold-btn:hover:not(:disabled) { filter: brightness(1.1); }
+  .hold-fill { 
+    position: absolute; 
+    top: 0; left: 0; bottom: 0; 
+    width: 0%; 
+    background: rgba(0,0,0,0.35); /* Darkens the red as it fills */
+    z-index: 1; 
+  }
+  .hold-text { 
+    position: relative; 
+    z-index: 2; 
+    pointer-events: none; 
+  }
   
   /* Timer & Progress */
   .timerbar-track {
@@ -263,7 +279,7 @@
   .loading-overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(30, 41, 59, 0.9); /* Matches card bg with opacity */
+    background: rgba(30, 41, 59, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -300,6 +316,7 @@ const SHEET_URL = "https://script.google.com/macros/s/AKfycbySbcSGjitwnFE3JsSBhm
 const ROUND_SECONDS = 26;
 const VERIFY_TIME_COST = 8;
 const VERIFY_LOADING_MS = 1000;
+const HOLD_TIME_MS = 1500;
 
 /* ============ SCENARIO DATA ============ */
 const SCENARIOS = [
@@ -377,6 +394,21 @@ const SCENARIOS = [
     },
     groundTruth:"It was a decoy, built specifically to read as high-confidence to sensors like this one.",
     score:{ engage:{ihl:-2,oversight:-3,mission:-2}, abort:{ihl:1,oversight:1,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
+  },
+  {
+    id:"sunk_cost", title:"The Sunk Cost", ambiguous:true, confidence:"Medium",
+    text:{
+      operator:"Target matches hostile profile, but heat blooms suggest civilian presence in adjacent structures. The current angle is insufficient to clear the backblast area.",
+      commander:"Target confirmed, but adjacent structures show potential civilian occupancy. Current feed cannot clear the backblast area.",
+      release_authority:"System recommendation: ENGAGE. Target matches profile, but adjacent structures show potential civilian heat signatures. Confidence: Medium."
+    },
+    reveal:{
+      operator:"Re-tasking sensor... Cloud cover and thermal interference obscure the view. The backblast area is STILL unverified, but we lost 8 seconds trying to check.",
+      commander:"Additional feed requested... Thermal interference obscuring the area. Civilian presence remains unconfirmed. Significant time lost.",
+      release_authority:"Supplementary imagery requested... Area obscured by thermal interference. Collateral damage estimate remains uncertain. Review window critically degraded."
+    },
+    groundTruth:"The target was hostile, but a family of four was in the adjacent structure and was killed in the strike.",
+    score:{ engage:{ihl:-4,oversight:-1,mission:-1}, abort:{ihl:1,oversight:1,mission:-2}, verify:{ihl:0,oversight:1,mission:0}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
     id:"name_on_list", title:"Name on the List", ambiguous:true, confidence:"Medium",
@@ -483,7 +515,10 @@ function freshState(){
     timer:null, timeLeft:ROUND_SECONDS, stale:false,
     contactsQueue:[], contactPos:0,
     currentRevealed:false, usedVerifyThisContact:false,
-    isVerifying:false 
+    isVerifying:false, isDemo:false, bdaShown:false,
+    
+    // Hesitation Tracking
+    hoverStart: null, totalHoverTime: 0, hesitatedCount: 0
   };
 }
 
@@ -531,10 +566,11 @@ function renderIntro(){
     <div class="card">
       <p>Militaries now use AI to sift sensor data and recommend targets. On paper, nothing gets engaged without a human sign-off — an officer reviews the recommendation before it's acted on.</p>
       <p>This isn't theoretical. Decision-support systems already coordinate real strikes. What that human sign-off actually requires — beyond a person nominally present — is still unresolved, from individual operators up to the bodies trying to govern these systems.</p>
-      <p>Ten scenarios. You'll pick a seat in the chain of command. The system will give you a recommendation and a confidence level. The clock runs regardless.</p>
+      <p>Eleven scenarios. You'll pick a seat in the chain of command. The system will give you a recommendation and a confidence level. The clock runs regardless.</p>
       <button class="startbtn" onclick="renderLawBrief()">Begin</button>
       <div class="disclosure">Your decisions are logged anonymously for research on how people interact with AI-assisted targeting recommendations.</div>
       
+      <!-- Takshashila Branding -->
       <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
         <img src="image_265385.png" alt="Takshashila Institution Logo" style="max-height: 80px; margin-bottom: 12px;">
         <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
@@ -575,7 +611,7 @@ function goToRoleSelect(){
     <h1>Choose your seat</h1>
     <p>Same incidents. Different vantage point.</p>
     ${Object.entries(ROLE_INFO).map(([key,info])=>`
-      <button class="role-btn" onclick="startSession('${key}')">
+      <button class="role-btn" onclick="startDemo('${key}')">
         <span class="rname">${info.name}</span>
         <span class="rdesc">${info.desc}</span>
       </button>
@@ -583,13 +619,38 @@ function goToRoleSelect(){
   `;
 }
 
-/* ============ SESSION START ============ */
-function startSession(role){
+/* ============ DEMO / TRAINING MODULE ============ */
+function startDemo(role){
   state = freshState();
   state.role = role;
   state.sessionId = uid();
-  loadRound(0);
+  state.isDemo = true;
+  
+  state.contactsQueue = [{
+    kind:"main",
+    scenario:{
+      id: "demo",
+      confidence:"High",
+      text:{
+        operator: "TRAINING MODULE: This is a practice scenario. Watch the timer above. Test the 'Request More Data' button to see how it costs time, then practice holding the 'Hold to Authorize' button to clear this screen.",
+        commander: "TRAINING MODULE: This is a practice scenario. Watch the timer above. Test the 'Request More Data' button to see how it costs time, then practice holding the 'Hold to Authorize' button to clear this screen.",
+        release_authority: "TRAINING MODULE: This is a practice scenario. Watch the timer above. Test the 'Request More Data' button to see how it costs time, then practice holding the 'Hold to Authorize' button to clear this screen."
+      },
+      reveal:{
+        operator: "Data revealed. Notice the timer dropped by 8 seconds. Make a final decision to begin the live simulation.",
+        commander: "Data revealed. Notice the timer dropped by 8 seconds. Make a final decision to begin the live simulation.",
+        release_authority: "Data revealed. Notice the timer dropped by 8 seconds. Make a final decision to begin the live simulation."
+      },
+      groundTruth: "This was a training simulation.",
+      score: { engage:{ihl:0,oversight:0,mission:0}, abort:{ihl:0,oversight:0,mission:0}, verify:{ihl:0,oversight:0,mission:0}, escalate:{ihl:0,oversight:0,mission:0} }
+    }
+  }];
+  state.contactPos = 0;
+  state.timeLeft = ROUND_SECONDS;
+  renderContact();
+  startTimer();
 }
+
 
 /* ============ ROUND / CONTACT SETUP ============ */
 function loadRound(idx){
@@ -610,6 +671,8 @@ function loadRound(idx){
   state.currentRevealed = false;
   state.usedVerifyThisContact = false;
   state.isVerifying = false;
+  state.totalHoverTime = 0;
+  state.hoverStart = null;
   renderContact();
   startTimer();
 }
@@ -644,11 +707,47 @@ function updateTimerUI(){
   });
 }
 
+/* ============ HOLD TO AUTHORIZE LOGIC ============ */
+let holdAnimFrame;
+let holdStartTime = 0;
+
+function startHold(action) {
+  if(state.isVerifying) return; 
+  const btn = document.querySelector(`button[data-action='${action}']`);
+  if(!btn) return;
+  const fill = btn.querySelector('.hold-fill');
+  holdStartTime = performance.now();
+
+  function update(time) {
+    let elapsed = time - holdStartTime;
+    let pct = Math.min(100, (elapsed / HOLD_TIME_MS) * 100);
+    if(fill) fill.style.width = pct + '%';
+    
+    if(pct >= 100) {
+      stopHold(action);
+      handleDecision(action);
+    } else {
+      holdAnimFrame = requestAnimationFrame(update);
+    }
+  }
+  holdAnimFrame = requestAnimationFrame(update);
+}
+
+function stopHold(action) {
+  cancelAnimationFrame(holdAnimFrame);
+  const btn = document.querySelector(`button[data-action='${action}']`);
+  if(btn) {
+    const fill = btn.querySelector('.hold-fill');
+    if(fill) fill.style.width = '0%';
+  }
+}
+
 /* ============ RENDER CONTACT ============ */
 function renderContact(){
   const item = state.contactsQueue[state.contactPos];
   const roleInfo = ROLE_INFO[state.role];
-  const totalRounds = SCENARIOS.length;
+  const totalRounds = state.isDemo ? 1 : SCENARIOS.length;
+  const roundLabel = state.isDemo ? "TRAINING MODULE" : `SCENARIO 0${state.roundIndex+1} // ${totalRounds}`;
   const contactTag = state.contactsQueue.length>1
     ? `<div class="contact-tag">QUEUE: CONTACT ${state.contactPos+1} OF ${state.contactsQueue.length}</div>` : "";
 
@@ -668,6 +767,17 @@ function renderContact(){
     menuEntries = roleInfo.menu.filter(([label,action]) => action !== "verify");
   }
   const menuButtons = menuEntries.map(([label,action])=>{
+    if(action === "engage") {
+      return `<button data-action="${action}" class="hold-btn" 
+               onmousedown="startHold('${action}')" 
+               onmouseup="stopHold('${action}')" 
+               onmouseleave="stopHold('${action}')" 
+               ontouchstart="startHold('${action}')" 
+               ontouchend="stopHold('${action}')">
+               <div class="hold-fill"></div>
+               <span class="hold-text">Hold to Authorize</span>
+             </button>`;
+    }
     const handler = action === "verify" ? `triggerVerify()` : `handleDecision('${action}')`;
     return `<button data-action="${action}" onclick="${handler}">${label}</button>`;
   }).join("");
@@ -686,7 +796,7 @@ function renderContact(){
   `;
 
   app.innerHTML = `
-    ${eyebrow(`SCENARIO 0${state.roundIndex+1} // 10`)}
+    ${eyebrow(roundLabel)}
     <h2>${roleInfo.name} Review</h2>
     <div class="card">
       ${loaderOverlay}
@@ -703,6 +813,18 @@ function renderContact(){
     </div>
   `;
   updateTimerUI();
+
+  // Track Hesitation on the 'Verify' button
+  const verifyBtn = document.querySelector('button[data-action="verify"]');
+  if(verifyBtn) {
+    verifyBtn.addEventListener('mouseenter', () => { state.hoverStart = performance.now(); });
+    verifyBtn.addEventListener('mouseleave', () => {
+      if(state.hoverStart) {
+        state.totalHoverTime += (performance.now() - state.hoverStart);
+        state.hoverStart = null;
+      }
+    });
+  }
 }
 
 /* ============ VERIFY (REVEAL) ============ */
@@ -722,9 +844,30 @@ function triggerVerify(){
   }, VERIFY_LOADING_MS);
 }
 
+/* ============ BDA INTERSTITIAL ============ */
+function triggerBDA() {
+  const msgs = [
+    "Command Update: Local OSINT reports indicate multiple civilian casualties in the sector following a recent strike. Verifying data.",
+    "Command Update: Allied forces in the sector report a friendly vehicle was targeted in a recent engagement. Investigating.",
+    "Command Update: Post-strike imagery shows a targeted facility was empty prior to engagement. Missed opportunity.",
+    "Command Update: Human rights observers are flashing emergency channels regarding an unauthorized strike on agricultural infrastructure."
+  ];
+  const msg = msgs[Math.floor(Math.random() * msgs.length)];
+  app.innerHTML = `
+    ${eyebrow("Incoming Intelligence Update")}
+    <div class="card" style="border-color: var(--accent-red); background: var(--accent-red-dim);">
+      <h2 style="color: var(--accent-red-text);">Battle Damage Assessment (BDA)</h2>
+      <p>${msg}</p>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 24px;">This is a network-wide update. It may or may not refer to a strike you authorized.</p>
+      <button class="startbtn" onclick="loadRound(${state.roundIndex + 1})">Acknowledge & Continue</button>
+    </div>
+  `;
+}
+
 /* ============ DECISION HANDLING ============ */
 function resolveFillerGroundTruth(filler){
-  if(filler.groundTruth === "__RANDOM__") return Math.random()<0.5 ? "legit" : "false_alarm";
+  if(filler.groundTruth === "__RANDOM__") return Math.random()<0.5 ? "The vehicle was legitimate civilian traffic." : "The vehicle was a confirmed hostile transport.";
+  if(filler.groundTruth === "legit") return "The vehicle was routine logistics traffic.";
   return filler.groundTruth;
 }
 function resolveScenarioGroundTruth(scenario){
@@ -738,6 +881,24 @@ function resolveScenarioGroundTruth(scenario){
 
 function handleDecision(action){
   if(state.isVerifying) return; 
+
+  if(state.isDemo) {
+      clearInterval(state.timer);
+      state.isDemo = false;
+      loadRound(0);
+      return;
+  }
+
+  // Finalize any active hover time logging
+  if(state.hoverStart) {
+      state.totalHoverTime += (performance.now() - state.hoverStart);
+      state.hoverStart = null;
+  }
+  
+  // If they engaged, hadn't verified, and hovered over verify for >1.5s, log hesitation
+  if(action === 'engage' && !state.usedVerifyThisContact && state.totalHoverTime > 1500) {
+      state.hesitatedCount++;
+  }
 
   const item = state.contactsQueue[state.contactPos];
   let ihl=0, oversight=0, mission=0, ambiguous=false, confidence, scenarioId, groundTruth, biasFlag=false;
@@ -761,9 +922,8 @@ function handleDecision(action){
     ambiguous = true;
     const s = f.score[action] || {ihl:0,oversight:0,mission:0};
     ihl = s.ihl; oversight = s.oversight; mission = s.mission;
-    const gt = resolveFillerGroundTruth(f);
-    groundTruth = gt;
-    if(s.random && gt==="false_alarm" && action==="engage"){ ihl-=2; oversight-=1; mission-=1; }
+    groundTruth = resolveFillerGroundTruth(f);
+    if(s.random && groundTruth.includes("civilian")){ ihl-=2; oversight-=1; mission-=1; }
     biasFlag = (action==="engage" && !usedVerify && (confidence==="Medium"||confidence==="High"));
     if(usedVerify){ ihl += 1; oversight += 2; }
   }
@@ -789,9 +949,14 @@ function handleDecision(action){
   state.contactPos += 1;
   state.currentRevealed = false;
   state.usedVerifyThisContact = false;
+  state.totalHoverTime = 0; // reset for next contact
 
   if(state.contactPos < state.contactsQueue.length){
     renderContact();
+  } else if(state.roundIndex === 4 && !state.bdaShown) {
+    clearInterval(state.timer);
+    state.bdaShown = true;
+    triggerBDA();
   } else if(state.roundIndex + 1 < SCENARIOS.length){
     loadRound(state.roundIndex + 1);
   } else {
@@ -834,7 +999,7 @@ function renderDebrief(meters, agg){
     </div>
   `;
 
-  const gtHTML = state.log.filter(r=>!r.scenario_id.startsWith("filler_")).map(r=>{
+  const gtHTML = state.log.filter(r=>!r.scenario_id.startsWith("filler_") && r.scenario_id !== "demo").map(r=>{
     const sc = SCENARIOS.find(s=>s.id===r.scenario_id);
     let compareLine = "";
     if(agg && agg[r.scenario_id]){
@@ -846,8 +1011,8 @@ function renderDebrief(meters, agg){
     }
     return `
       <div class="gt-block">
-        <div class="gt-title">${sc.title} — you chose: ${r.decision.toUpperCase()}${r.used_verify ? " (after requesting more detail)":""}${r.waited_for_pressure ? " (window closed)":""}</div>
-        <div class="gt-truth">Actually: ${r.groundTruth}</div>
+        <div class="gt-title">${sc.title} — you chose: ${r.decision.toUpperCase()}${r.used_verify ? " (after requesting more data)":""}${r.waited_for_pressure ? " (window closed)":""}</div>
+        <div class="gt-truth">Actually: ${r.ground_truth}</div>
         ${compareLine}
       </div>
     `;
@@ -861,10 +1026,25 @@ function renderDebrief(meters, agg){
       ${meterHTML("International Humanitarian Law (IHL) compliance", meters.ihl)}
       ${meterHTML("Oversight retained", meters.oversight)}
       ${meterHTML("Mission outcome", meters.mission)}
+      
+      <!-- Score Context -->
+      <div style="font-size: 13px; color: var(--text-muted); margin: 16px 0; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px;">
+        <strong>How this is calculated:</strong><br>
+        • <em>IHL Compliance:</em> Decreases when you authorize strikes on civilians or decoys.<br>
+        • <em>Oversight:</em> Decreases when you trust low/medium confidence AI without verifying.<br>
+        • <em>Mission Outcome:</em> Decreases when you abort strikes on valid hostile targets.
+      </div>
+
       <div class="meter-row" style="margin-top:32px;">
-        <div class="meter-label" style="color:var(--accent-red-text);"><span>Automation bias reading</span></div>
+        <div class="meter-label" style="color:var(--accent-red-text);"><span>Automation Bias Reading</span></div>
         <div class="bignum">${state.biasCount} / ${SCENARIOS.length}</div>
-        <p style="margin-top:6px; font-size:13px; color:var(--text-muted);">Times you followed a medium-or-high-confidence recommendation without requesting more detail first, in a scenario built to be ambiguous.</p>
+        <p style="margin-top:6px; font-size:13px; color:var(--text-muted);">Times you authorized a medium-or-high-confidence recommendation without requesting more detail first, in an ambiguous scenario.</p>
+      </div>
+      
+      <div class="meter-row" style="margin-top:24px;">
+        <div class="meter-label" style="color:var(--text-main);"><span>Hesitation Factor</span></div>
+        <div class="bignum" style="color: var(--accent-blue);">${state.hesitatedCount}</div>
+        <p style="margin-top:6px; font-size:13px; color:var(--text-muted);">Times you hesitated (hovered over 'Request More Data' for over 1.5 seconds) but ultimately chose to trust the machine's initial read.</p>
       </div>
     </div>
 
