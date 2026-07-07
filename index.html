@@ -55,6 +55,7 @@
     justify-content: space-between;
     border-bottom: 1px solid var(--border);
     padding-bottom: 8px;
+    margin-bottom: 20px;
   }
   
   h1 {
@@ -193,10 +194,11 @@
     background: var(--bg-card);
     text-align: left;
     margin-bottom: 12px;
+    padding: 20px;
   }
   .role-btn:hover { background: var(--border); }
-  .role-btn .rname { font-weight: 600; display: block; margin-bottom: 4px; color: var(--text-main); }
-  .role-btn .rdesc { font-size: 13px; color: var(--text-muted); font-weight: normal; }
+  .role-btn .rname { font-weight: 600; display: block; margin-bottom: 6px; color: var(--text-main); font-size: 16px; }
+  .role-btn .rdesc { font-size: 13.5px; color: var(--text-body); font-weight: normal; line-height: 1.5; }
   
   .restart { text-align: center; margin-top: 20px; }
   .restart:hover { background: var(--border); }
@@ -387,7 +389,6 @@
 <script>
 /* ============ CONFIG ============ */
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbySbcSGjitwnFE3JsSBhm-HPfRMSI5UBbE6S7j8Io3qrYfJu0DkKHS7tKrB6SXQMVcSXA/exec";
-const ROUND_SECONDS = 30; 
 const VERIFY_TIME_COST = 8;
 const VERIFY_LOADING_MS = 1000;
 const HOLD_TIME_MS = 1500;
@@ -400,27 +401,27 @@ const SCENARIOS = [
     revealVisual: `<div class="sensor-window"><div class="sensor-overlay"></div><div style="filter: blur(2px); display: flex; gap: 8px; align-items: center;"><div style="width:16px; height:16px; background:#ef4444; border-radius:50%;"></div><div style="width:16px; height:16px; background:#ef4444; border-radius:50%;"></div><div style="width:16px; height:16px; background:#ef4444; border-radius:2px; position:relative;"><div style="position:absolute; width:50px; height:3px; background:#3b82f6; top:6px; left:-15px; transform:rotate(-15deg);"></div></div><div style="width:10px; height:10px; background:#f59e0b; border-radius:50%;"></div><div style="width:10px; height:10px; background:#f59e0b; border-radius:50%;"></div></div><div style="position: absolute; bottom: 8px; left: 8px; color: var(--accent-blue); font-family: var(--font-mono); font-size: 10px;">OBJ RECLASSIFIED: NON-COMBAT</div></div>`,
     text:{
       operator:"Thermal feed shows six heat signatures moving along a high-altitude contested ridge, roughly two kilometers from the last recorded infiltration point. One figure appears to be carrying something long and rigid across their shoulders; the others are harder to read at this angle.",
-      commander:"Division feed flags six signatures on Ridge Sector 4. Local Intel indicates recent insurgent infiltration attempts, but also seasonal herder movement in this valley. One figure is carrying a long rigid object. No ground unit corroboration."
+      commander:"Division feed flags six signatures on Ridge Sector 4 moving at 4km/h. Local Intel (Signals Intelligence & Open-Source Intelligence) indicates recent insurgent infiltration attempts in this exact grid, but civil affairs reports note seasonal herder movement overlapping this route. One figure is carrying a long rigid object consistent with a man-portable weapon system. No ground unit corroboration available."
     },
     reveal:{
       operator:"Re-tasking the sensor for a tighter angle: the 'weapon' resolves into a length of PVC pipe. Two of the six are noticeably smaller in frame — possibly minors.",
       commander:"Additional drone pass requested: object reclassified as agricultural/irrigation pipe, not a weapon. Two of the six read as smaller-framed, highly likely to be minors."
     },
     groundTruth:"Local herders moving irrigation pipe to a mountain terrace. No weapons present. Two of the six were teenagers helping carry equipment.",
-    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1} }
+    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
     id:"target_tradeoff", title:"Who Pays for the Target", ambiguous:false, confidence:"High",
     text:{
       operator:"Feed confirms the target inside a compound. Four additional heat signatures are present inside the structure, clustered in what looks like a common room.",
-      commander:"High-value contact (HVT) confirmed via drone feed in a border village compound. Target is a known IED specialist responsible for recent convoy ambushes. Four additional occupants detected inside. Note: Target is known to use family members as human shields."
+      commander:"High-value contact (High-Value Target 'Alpha') confirmed via drone feed inside a border village compound. Target is a known IED specialist responsible for three recent convoy ambushes. Four additional occupants detected inside the primary structure. Sector intel notes: Target historically uses family members as human shields to deter strikes. Overcast weather limits secondary visual confirmation."
     },
     reveal:{
       operator:"Pulling pattern-of-life data: the four additional signatures have shown up at this address on nine of the last ten evenings. Two read as child-sized on thermal.",
       commander:"Pattern-of-life check requested: the same four occupants have been present most evenings this week. Two signatures are consistent with children. Strike will result in high collateral."
     },
     groundTruth:"Target confirmed accurate. Two of the four additional occupants were his children, who were home essentially every evening this week.",
-    score:{ engage:{ihl:-2,oversight:-1,mission:2}, abort:{ihl:1,oversight:1,mission:-2}, verify:{ihl:2,oversight:2,mission:1} }
+    score:{ engage:{ihl:-2,oversight:-1,mission:2}, abort:{ihl:1,oversight:1,mission:-2}, verify:{ihl:2,oversight:2,mission:1}, escalate:{ihl:1,oversight:2,mission:0} }
   },
   {
     id:"too_many_fast", title:"Too Many, Too Fast", ambiguous:true, confidence:"Medium",
@@ -428,14 +429,14 @@ const SCENARIOS = [
     revealVisual: `<div class="sensor-window"><div class="sensor-overlay"></div><div style="width: 110px; height: 110px; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 50%; position: relative;"><div class="radar-spin-slow" style="position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(rgba(59,130,246,0.1) 0deg, rgba(59,130,246,0.3) 20deg, transparent 20deg);"></div><div style="position: absolute; width: 6px; height: 6px; background: #3b82f6; border-radius: 50%; top: 25px; left: 35px;"></div><div style="position: absolute; width: 6px; height: 6px; background: #3b82f6; border-radius: 50%; top: 65px; left: 75px;"></div><div class="blink" style="position: absolute; width: 6px; height: 6px; background: #ef4444; border-radius: 50%; top: 50px; left: 45px; box-shadow: 0 0 4px #ef4444;"></div></div><div style="position: absolute; bottom: 8px; right: 8px; color: var(--text-muted); font-family: var(--font-mono); font-size: 10px;">TARGET ISOLATED</div></div>`,
     text:{
       operator:"Feed cycling rapidly across the valley supply artery — three separate contacts within the same eight-second window. No time to settle on any single frame before the next appears.",
-      commander:"Three fast-moving contacts appearing simultaneously on the primary valley supply artery. Division intel explicitly warns of decoy convoys running concurrently to mask actual weapon shipments."
+      commander:"Three fast-moving vehicular contacts appearing simultaneously on the primary valley supply artery. Division Signals Intelligence explicitly warns of coordinated decoy convoys running concurrently to mask actual heavy weapon shipments across the border. Automation is flagging all three as potential threats, overloading the standard review queue."
     },
     reveal:{
       operator:"Holding the feed on each contact in turn: two show standard cargo-vehicle profiles, unmarked. One shows a profile consistent with a technical — a mounted weapon visible on closer look.",
       commander:"Slower pass authorized across all three: two read as standard local logistics vehicles, one shows a mounted heavy weapon hidden under tarp on closer inspection."
     },
     groundTruth:"Two were local resupply vehicles moving routine cargo. One was a legitimate hostile transport, carrying a mounted weapon.",
-    score:{ engage:{ihl:-2,oversight:-2,mission:-1}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:2,oversight:3,mission:1} }
+    score:{ engage:{ihl:-2,oversight:-2,mission:-1}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
     id:"flying_blind", title:"Flying Blind", ambiguous:true, confidence:"Low",
@@ -443,14 +444,14 @@ const SCENARIOS = [
     revealVisual: `<div class="sensor-window"><div class="sensor-static" style="opacity: 0.4;"></div><div style="filter: blur(10px); width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%;"></div><div style="position: absolute; bottom: 8px; left: 8px; color: var(--accent-yellow); font-family: var(--font-mono); font-size: 10px; z-index: 3;">PARTIAL FEED: CLASSIFICATION NULL</div></div>`,
     text:{
       operator:"The feed is freezing intermittently. The last clean frame before the link degraded shows a possible contact near the dense pine canopy, but there's no way to confirm it from here.",
-      commander:"UAV link has severely degraded due to localized mountain weather and possible jamming. Asset marked for autonomous fallback. Radar briefly painted a target near the treeline before drop-off."
+      commander:"UAV telemetry and video link have severely degraded due to a combination of localized mountain blizzards and suspected hostile electronic warfare (jamming). Asset is marked for autonomous fallback if not commanded. Ground-moving-target-indicator (GMTI) radar briefly painted a single, non-squawking target near the pine canopy before total signal drop-off."
     },
     reveal:{
       operator:"Attempting to re-establish the link: a partial signal comes through — enough to confirm a contact is present, not enough to classify it.",
       commander:"Partial reconnection achieved: confirms a physical contact is present near the treeline. However, visual classification data is still corrupted."
     },
     groundTruth:"__RANDOM__",
-    score:{ engage:{ihl:0,oversight:-2,mission:1, random:true}, abort:{ihl:0,oversight:2,mission:-1}, verify:{ihl:1,oversight:2,mission:0} }
+    score:{ engage:{ihl:0,oversight:-2,mission:1, random:true}, abort:{ihl:0,oversight:2,mission:-1}, verify:{ihl:1,oversight:2,mission:0}, escalate:{ihl:1,oversight:1,mission:-1} }
   },
   {
     id:"decoy_problem", title:"The Decoy Problem", ambiguous:true, confidence:"High",
@@ -458,40 +459,40 @@ const SCENARIOS = [
     revealVisual: `<div class="sensor-window"><div class="sensor-overlay"></div><div style="filter: blur(2px); position:relative;"><div style="width: 44px; height: 44px; background: #ef4444;"></div><div style="position:absolute; inset:0; background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.5) 4px, rgba(255,255,255,0.5) 5px);"></div></div><div style="position: absolute; bottom: 8px; right: 8px; color: var(--accent-yellow); font-family: var(--font-mono); font-size: 10px;">WARN: SYNTHETIC SIGNATURE DETECTED</div></div>`,
     text:{
       operator:"The signature reads clean — almost textbook. Recent intelligence flagged decoy activity in this sector, built specifically to read this way to sensors like this one.",
-      commander:"High-confidence target detected in transit zone. However, Sector intel warns of sophisticated thermal blankets and decoys recently deployed by infiltrators to bait drone strikes and expose our positions."
+      commander:"High-confidence armored target detected stationary in a known transit zone. However, Sector Intelligence issued an urgent flash warning regarding sophisticated thermal blankets and battery-powered decoys recently deployed by infiltrators. These are designed to bait drone strikes, deplete our ordnance, and expose our firing positions to counter-battery fire."
     },
     reveal:{
       operator:"Requesting a secondary sensor pass: the thermal signature is almost too uniform — real equipment usually shows more variation. Consistent with known decoy construction.",
       commander:"Secondary pass requested: signature shows unusually uniform heat distribution, lacking the engine block hotspots typical of real vehicles. Highly consistent with decoy rigs."
     },
     groundTruth:"It was a decoy, built specifically to read as high-confidence to sensors like this one.",
-    score:{ engage:{ihl:-2,oversight:-3,mission:-2}, abort:{ihl:1,oversight:1,mission:0}, verify:{ihl:2,oversight:3,mission:1} }
+    score:{ engage:{ihl:-2,oversight:-3,mission:-2}, abort:{ihl:1,oversight:1,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
     id:"sunk_cost", title:"The Sunk Cost", ambiguous:true, confidence:"Medium",
     text:{
       operator:"Target matches hostile profile, but heat blooms suggest civilian presence in adjacent structures. The current angle is insufficient to clear the backblast area.",
-      commander:"Target confirmed in an abandoned mountain outpost, but adjacent shepherd huts show potential civilian occupancy. Current angle cannot clear the backblast area. Division expects a strike before the weather window closes."
+      commander:"Target confirmed occupying an abandoned mountain outpost. However, thermal spillover suggests adjacent shepherd huts may have civilian occupancy (estimated 3-5 persons). The current drone orbit angle cannot clear the backblast area for a safe collateral damage estimate. Division command expects a strike before the incoming winter storm closes the operational weather window completely."
     },
     reveal:{
       operator:"Re-tasking sensor... Cloud cover and thermal interference obscure the view. The backblast area is STILL unverified, but we lost 8 seconds trying to check.",
       commander:"Additional feed requested... Heavy valley fog obscuring the area. Civilian presence remains unconfirmed. Significant review time lost with no operational gain."
     },
     groundTruth:"The target was hostile, but a family of local herders was taking shelter in the adjacent structure and was killed in the strike.",
-    score:{ engage:{ihl:-4,oversight:-1,mission:-1}, abort:{ihl:1,oversight:1,mission:-2}, verify:{ihl:0,oversight:1,mission:0} }
+    score:{ engage:{ihl:-4,oversight:-1,mission:-1}, abort:{ihl:1,oversight:1,mission:-2}, verify:{ihl:0,oversight:1,mission:0}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
     id:"name_on_list", title:"Name on the List", ambiguous:true, confidence:"Medium",
     text:{
       operator:"Facial/ID match returns a name on the target list — a 79% match against the reference photo on file. No live visual confirmation beyond the match itself.",
-      commander:"Watchlist match returned at a high-altitude transit hub: 79% confidence. Target is listed as a high-ranking militant recruiter. No independent visual confirmation, and facial rec often struggles with heavy winter gear."
+      commander:"Automated biometric watchlist match returned at a high-altitude transit hub: 79% confidence. Target is listed as a high-ranking militant recruiter seeking to cross the pass. No independent visual confirmation from human assets on the ground. Be advised: algorithm confidence scores are historically inflated in this region, as facial recognition struggles with heavy winter gear and scarves."
     },
     reveal:{
       operator:"Cross-checking a second database: the reference photo on file is eleven years old. Match confidence is less reliable against such dated imagery.",
       commander:"Secondary database check: reference photo is over a decade old. Match confidence is inherently flawed when comparing heavy winter gear against aged reference imagery."
     },
     groundTruth:"The match was against an outdated reference photo. The person on-site was misidentified — a relative of the listed individual with a similar build.",
-    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1} }
+    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
     id:"the_pattern", title:"The Pattern", ambiguous:true, confidence:"Medium",
@@ -504,7 +505,7 @@ const SCENARIOS = [
       commander:"Extended history pulled: this movement pattern predates the bunker's hostile-linked flag by six weeks. Likely civilian/smuggler routine rather than military logistics."
     },
     groundTruth:"The site is a shared storage cache. The pattern was a local resident collecting rations at the same time each evening, unrelated to the site's newer flag.",
-    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1} }
+    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
     id:"someone_elses_rules", title:"Someone Else's Rules", ambiguous:true, confidence:"Medium",
@@ -514,15 +515,15 @@ const SCENARIOS = [
     },
     reveal:{
       operator:"Requesting the underlying criteria from the partner system: their confidence threshold for 'armed' is lower than yours would be for the same sensor data.",
-      commander:"Criteria requested from the allied feed: their bar for classifying a contact as 'armed and imminent' sits significantly lower than our own standing RoE threshold."
+      commander:"Criteria requested from the allied feed: their bar for classifying a contact as 'armed and imminent' sits significantly lower than our own standing Rules of Engagement threshold."
     },
     groundTruth:"The partner system's recommendation was technically correct under its own rules, which were more permissive than the standard the requesting command normally applies.",
-    score:{ engage:{ihl:-2,oversight:-2,mission:1}, abort:{ihl:1,oversight:1,mission:-1}, verify:{ihl:2,oversight:2,mission:0} }
+    score:{ engage:{ihl:-2,oversight:-2,mission:1}, abort:{ihl:1,oversight:1,mission:-1}, verify:{ihl:2,oversight:2,mission:0}, escalate:{ihl:1,oversight:2,mission:0} }
   },
   {
     id:"borrowed_time", title:"Borrowed Time", ambiguous:true, confidence:"Medium",
     text:{
-      operator:"The asset is on a hard battery limit — it aborts and returns automatically in under a minute regardless of what you decide. This isn't a system delay. It's the platform's actual limit.",
+      operator:"The asset is on a hard fuel limit — it aborts and returns automatically in under a minute regardless of what you decide. This isn't a system delay. It's the platform's actual limit.",
       commander:"UAV operating at extreme altitude limits; battery draining fast due to sub-zero temperatures. Automatic return-to-base in under a minute, independent of any command input."
     },
     reveal:{
@@ -530,37 +531,43 @@ const SCENARIOS = [
       commander:"Margin check requested: a small buffer exists beyond the displayed limit, but insufficient to establish a new orbit for meaningful verification."
     },
     groundTruth:"__RANDOM__",
-    score:{ engage:{ihl:0,oversight:-1,mission:1, random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:1,oversight:2,mission:0} }
+    score:{ engage:{ihl:0,oversight:-1,mission:1, random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:1,oversight:2,mission:0}, escalate:{ihl:1,oversight:1,mission:-1} }
   },
   {
     id:"one_bad_read", title:"One Bad Read", ambiguous:true, confidence:"Medium",
     text:{
       operator:"This is the same asset that correctly flagged a real threat two contacts ago. Its confidence score on this new contact is displayed the same way — nothing distinguishes a well-earned read from a lucky one.",
-      commander:"System recommendation from the same drone that correctly flagged a hostile patrol yesterday. Current confidence score carries no indication of whether this specific read is comparably reliable, and valley thermals are chaotic today."
+      commander:"System engagement recommendation originated from the exact same drone unit that correctly flagged a hostile patrol 24 hours ago. However, the current AI confidence score carries no metadata indicating if this specific read is comparably reliable. Furthermore, meteorological data shows valley thermals are highly chaotic today, leading to significant sensor artifacting."
     },
     reveal:{
       operator:"Pulling the asset's raw sensor log for this contact specifically: the underlying signal is noticeably weaker than the one behind its earlier correct call.",
       commander:"Raw signal log requested: this contact's underlying data is measurably weaker and more distorted than the data behind the asset's earlier, correct recommendation."
     },
     groundTruth:"__RANDOM__",
-    score:{ engage:{ihl:0,oversight:-2,mission:1, random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:2,oversight:3,mission:1} }
+    score:{ engage:{ihl:0,oversight:-2,mission:1, random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   }
 ];
 
 const FILLERS = [
   { key:"resupply", label:"Unregistered vehicle, logistics route", confidence:"Low", groundTruth:"legit",
     reveal:"Closer look: cargo visible through an open hatch — routine supplies, unmarked truck consistent with prior logistics traffic on this route.",
-    score:{ engage:{ihl:-1,oversight:-1,mission:-1}, abort:{ihl:0,oversight:1,mission:1}, verify:{ihl:1,oversight:1,mission:1} } },
+    score:{ engage:{ihl:-1,oversight:-1,mission:-1}, abort:{ihl:0,oversight:1,mission:1}, verify:{ihl:1,oversight:1,mission:1}, escalate:{ihl:1,oversight:1,mission:0} } },
   { key:"unknown", label:"Unidentified signature, edge of sector", confidence:"Medium", groundTruth:"__RANDOM__",
     reveal:"Second pass: the shape reads as a light vehicle, holding steady speed. Consistent with both prior harmless traffic and prior hostile traffic in this sector — the extra look narrows it, but doesn't settle it.",
-    score:{ engage:{ihl:0,oversight:0,mission:0,random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:1,oversight:1,mission:0} } }
+    score:{ engage:{ihl:0,oversight:0,mission:0,random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:1,oversight:1,mission:0}, escalate:{ihl:1,oversight:1,mission:0} } }
 ];
 
 const ROLE_INFO = {
-  operator:{ name:"Operator", desc:"Hands on the sensor. You see the raw visual feed directly.",
-    menu:[["Hold / Abort","abort"],["Request More Data","verify"],["Hold to Authorize","engage"]] },
-  commander:{ name:"Commander", desc:"Overseeing the sector. You see the feed plus strategic intelligence.",
-    menu:[["Hold / Abort","abort"],["Request More Data","verify"],["Hold to Authorize","engage"]] }
+  operator:{ 
+    name:"Operator", 
+    desc: "You are the eyes on the ground. You have direct control over the drone's sensor payload, staring at raw visual and thermal feeds. Your job is to identify threats based on Rules of Engagement and pass immediate tactical tracking recommendations up the chain.",
+    menu:[["Abort","abort"],["Request More Data","verify"],["Escalate to Command","escalate"],["Hold to Authorize","engage"]] 
+  },
+  commander:{ 
+    name:"Commander", 
+    desc: "You oversee the entire active sector from the Tactical Operations Center. You do not just see the raw drone feed; you have simultaneous access to live signals intelligence, deep pattern-of-life databases, and broader geopolitical constraints.",
+    menu:[["Abort","abort"],["Request More Data","verify"],["Hold to Authorize","engage"]] 
+  }
 };
 
 /* ============ STATE ============ */
@@ -570,7 +577,7 @@ function freshState(){
   return {
     role:null, sessionId:null, roundIndex:0, log:[],
     meters:{ihl:50,oversight:50,mission:50}, biasCount:0,
-    timer:null, timeLeft:ROUND_SECONDS, stale:false,
+    timer:null, timeLeft:30, totalTimeForRound: 30, stale:false,
     contactsQueue:[], contactPos:0,
     currentRevealed:false, usedVerifyThisContact:false,
     isVerifying:false, isDemo:false, demoStep:0, bdaShown:false,
@@ -628,6 +635,7 @@ function renderIntro(){
       <button class="startbtn" onclick="renderLawBrief()">Begin</button>
       <div class="disclosure">Your decisions are logged anonymously for research on how people interact with AI-assisted targeting recommendations.</div>
       
+      <!-- Takshashila Branding -->
       <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
         <img src="image_265385.png" alt="Takshashila Institution Logo" style="max-height: 80px; margin-bottom: 12px;">
         <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
@@ -689,11 +697,12 @@ function startDemo(){
         operator: "Notice that requesting context triggered a 1-second visual buffer and immediately deducted 8.0s from your main review clock. Now, test the authorization key.",
       },
       groundTruth: "This was a training simulation.",
-      score: { engage:{ihl:0,oversight:0,mission:0}, abort:{ihl:0,oversight:0,mission:0}, verify:{ihl:0,oversight:0,mission:0} }
+      score: { engage:{ihl:0,oversight:0,mission:0}, abort:{ihl:0,oversight:0,mission:0}, verify:{ihl:0,oversight:0,mission:0}, escalate:{ihl:0,oversight:0,mission:0} }
     }
   }];
   state.contactPos = 0;
-  state.timeLeft = ROUND_SECONDS;
+  state.totalTimeForRound = 30;
+  state.timeLeft = 30;
   renderContact();
   startTimer();
 }
@@ -702,7 +711,7 @@ function goToRoleSelect(){
   app.innerHTML = `
     ${eyebrow("Authority Selection")}
     <h1>Choose your seat</h1>
-    <p>Same incidents. Different vantage point. Select your role deployment to begin the live tracking sequence.</p>
+    <p>Select your deployment profile to step into the tracking line.</p>
     ${Object.entries(ROLE_INFO).map(([key,info])=>`
       <button class="role-btn" onclick="startSession('${key}')">
         <span class="rname">${info.name}</span>
@@ -734,7 +743,14 @@ function loadRound(idx){
   }
   state.contactsQueue = queue;
   state.contactPos = 0;
-  state.timeLeft = ROUND_SECONDS;
+  
+  let customLimit = 30;
+  if(state.role === "commander" && scenario.id === "too_many_fast") {
+    customLimit = 40;
+  }
+  
+  state.totalTimeForRound = customLimit;
+  state.timeLeft = customLimit;
   state.stale = false;
   state.currentRevealed = false;
   state.usedVerifyThisContact = false;
@@ -765,7 +781,7 @@ function updateTimerUI(){
   const label = document.getElementById("timerlabel");
   const staleNote = document.getElementById("staleNote");
   if(!fill) return;
-  const pct = Math.max(0,(state.timeLeft/ROUND_SECONDS)*100);
+  const pct = Math.max(0,(state.timeLeft/state.totalTimeForRound)*100);
   fill.style.width = pct+"%";
   fill.style.background = pct>30 ? "var(--accent-blue)" : "var(--accent-red)";
   if(label) label.textContent = state.stale ? "TIME EXPIRED" : `T-MINUS ${state.timeLeft}.0s`;
@@ -775,13 +791,9 @@ function updateTimerUI(){
   });
 }
 
-/* ============ HOLD TO AUTHORIZE LOGIC ============ */
-let holdAnimFrame;
-let holdStartTime = 0;
-
 function startHold(action) {
   if(state.isVerifying) return; 
-  if(state.isDemo && state.demoStep === 1) return; // Block in demo step 1
+  if(state.isDemo && state.demoStep === 1) return;
   
   const btn = document.querySelector(`button[data-action='${action}']`);
   if(!btn) return;
@@ -815,7 +827,7 @@ function stopHold(action) {
 /* ============ RENDER CONTACT ============ */
 function renderContact(){
   const item = state.contactsQueue[state.contactPos];
-  const roleInfo = state.isDemo ? { name: "Training Officer", menu: [["Hold / Abort", "abort"], ["Request More Data", "verify"], ["Hold to Authorize", "engage"]] } : ROLE_INFO[state.role];
+  const roleInfo = state.isDemo ? { name: "Training Officer", menu: [["Abort", "abort"], ["Request More Data", "verify"], ["Hold to Authorize", "engage"]] } : ROLE_INFO[state.role];
   const totalRounds = state.isDemo ? 1 : SCENARIOS.length;
   const roundLabel = state.isDemo ? "TRAINING OVERLAY" : `SCENARIO 0${state.roundIndex+1} // ${totalRounds}`;
   const contactTag = state.contactsQueue.length>1
@@ -832,7 +844,6 @@ function renderContact(){
     confidence = item.scenario.confidence;
     revealText = item.scenario.reveal[state.role];
     
-    // Inject visual if it exists for this scenario
     if (item.scenario.visual) {
       visualBlock = (state.currentRevealed && item.scenario.revealVisual) 
         ? item.scenario.revealVisual 
@@ -844,7 +855,7 @@ function renderContact(){
     revealText = item.filler.reveal || null;
   }
 
-  let menuButtons = roleInfo.menu.map(([label,action])=>{
+  let menuButtons = roleInfo.menu.map(([label,action]) => {
     if(state.currentRevealed && action === "verify") return ""; 
 
     let tooltip = "";
@@ -914,7 +925,7 @@ function renderContact(){
         <p>${bodyText}</p>
         ${revealBlock}
         <div class="timerbar-track"><div class="timerbar-fill" id="timerfill" style="width:100%"></div></div>
-        <div class="timerlabel" id="timerlabel">T-MINUS ${ROUND_SECONDS}.0s</div>
+        <div class="timerlabel" id="timerlabel">T-MINUS ${state.timeLeft}.0s</div>
         <div class="stale-note" id="staleNote" style="display:none;">Window closed — telemetry is stale. Force final decision.</div>
         ${menuButtons}
       </div>
@@ -922,7 +933,6 @@ function renderContact(){
   `;
   updateTimerUI();
 
-  // Track Hesitation
   const verifyBtn = document.querySelector('button[data-action="verify"]');
   if(verifyBtn && !state.isDemo) {
     verifyBtn.addEventListener('mouseenter', () => { state.hoverStart = performance.now(); });
@@ -940,7 +950,7 @@ function triggerVerify(){
   if(state.currentRevealed || state.stale || state.isVerifying) return;
   
   if(state.isDemo && state.demoStep === 1) {
-    state.demoStep = 2; // Advance demo
+    state.demoStep = 2;
   }
 
   state.isVerifying = true;
@@ -1008,7 +1018,6 @@ function handleDecision(action){
       return;
   }
 
-  // Finalize any active hover time logging
   if(state.hoverStart) {
       state.totalHoverTime += (performance.now() - state.hoverStart);
       state.hoverStart = null;
@@ -1103,12 +1112,6 @@ async function finishSession(){
   renderDebrief(meters, agg);
 }
 
-function meterColor(v){
-  if(v>=66) return "var(--accent-blue)";
-  if(v>=40) return "#94A3B8"; 
-  return "var(--accent-red)";
-}
-
 function renderDebrief(meters, agg){
   const meterHTML = (label,val) => `
     <div class="meter-row">
@@ -1125,7 +1128,7 @@ function renderDebrief(meters, agg){
       const total = Object.values(counts).reduce((a,b)=>a+b,0);
       const yours = counts[r.decision] || 0;
       const pct = total>0 ? Math.round((yours/total)*100) : null;
-      if(pct!==null) compareLine = `<div class="compare-line">${pct}% of players made the same call here.</div>`;
+      if(pct!==null) compareLine = `<div class="compare-line" style="font-size:13px; color:var(--text-muted); margin-top:4px;">${pct}% of players made the same call here.</div>`;
     }
     return `
       <div class="gt-block">
@@ -1165,6 +1168,13 @@ function renderDebrief(meters, agg){
       </div>
     </div>
 
+    <h2>Global Simulation Trends</h2>
+    <div class="card" style="border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.05);">
+      <p style="font-size: 14.5px; line-height: 1.6; color: #93C5FD; margin: 0;">
+        Based on the overall results from this programme so far, a clear pattern has emerged: when presented with a confident recommendation from the machine, the majority of people choose to trust it immediately rather than taking the time to request more data. Across all participants, there is a strong tendency to favour the speed of automated targeting over the careful verification required by human oversight, especially when the clock is ticking down. This highlights just how easily we default to automation bias when placed under pressure.
+      </p>
+    </div>
+
     <h2>What actually happened</h2>
     ${gtHTML}
 
@@ -1175,6 +1185,12 @@ function renderDebrief(meters, agg){
 
     <button class="restart" onclick="renderIntro()">Run Simulation Again</button>
   `;
+}
+
+function meterColor(v){
+  if(v>=66) return "var(--accent-blue)";
+  if(v>=40) return "#94A3B8"; 
+  return "var(--accent-red)";
 }
 
 /* ============ INIT ============ */
