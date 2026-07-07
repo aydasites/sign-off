@@ -3,189 +3,292 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign-Off</title>
+<title>Sign-Off (Hybrid SaaS Interface)</title>
 <style>
-  :root{
-    --paper: #F2EFE6;
-    --paper-card: #E9E4D4;
-    --ink: #2B2A26;
-    --ink-soft: #6B675C;
-    --olive: #5F6B44;
-    --olive-dim: #8C9270;
-    --brick: #A13D2E;
-    --brick-dim: #C97A6C;
-    --line: #C9C2AC;
-    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", "Courier New", monospace;
+  :root {
+    /* HYBRID SAAS / TACTICAL THEME */
+    --bg-page: #0B1121; /* Deep slate, almost black */
+    --bg-card: #1E293B; /* Dark blue/grey slate */
+    --border: #334155; /* Subtle separation lines */
+    
+    --text-main: #F8FAFC; /* Bright white for primary text */
+    --text-body: #CBD5E1; /* Soft grey for reading */
+    --text-muted: #94A3B8; /* Muted telemetry text */
+    
+    /* UI Accents */
+    --accent-blue: #3B82F6; /* Corporate/Digital Blue */
+    --accent-red: #DC2626; /* Lethal/Danger Red */
+    --accent-red-dim: rgba(239, 68, 68, 0.1);
+    --accent-red-text: #FCA5A5;
+    
+    --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", monospace;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:var(--mono);
-    min-height:100vh;
-    line-height:1.5;
+  
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  
+  body {
+    background: var(--bg-page);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    line-height: 1.6;
   }
-  #app{
-    max-width:640px;
-    margin:0 auto;
-    padding:32px 20px 60px;
+  
+  #app {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
   }
-  .eyebrow{
-    font-size:11px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    border-bottom:1px solid var(--line);
-    padding-bottom:8px;
-    margin-bottom:20px;
-    display:flex;
-    justify-content:space-between;
+  
+  /* Typography & Structure */
+  .eyebrow {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
   }
-  h1{
-    font-size:28px;
-    letter-spacing:-0.01em;
-    margin:0 0 4px;
+  
+  h1 {
+    font-size: 24px;
+    color: var(--text-main);
+    margin: 0 0 8px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
-  h2{
-    font-size:16px;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    color:var(--olive);
-    margin:0 0 14px;
+  
+  h2 {
+    font-size: 18px;
+    color: var(--text-main);
+    margin: 0 0 16px;
+    font-weight: 500;
   }
-  p{margin:0 0 14px; font-size:14.5px;}
-  .card{
-    background:var(--paper-card);
-    border:1px solid var(--line);
-    border-radius:2px;
-    padding:20px;
-    margin-bottom:16px;
+  
+  h3 {
+    font-size: 14px;
+    color: var(--text-main);
+    margin: 24px 0 8px;
+    font-weight: 600;
   }
-  .stamp{
-    display:inline-block;
-    border:1px solid var(--brick);
-    color:var(--brick);
-    font-size:10px;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    padding:3px 8px;
-    margin-bottom:14px;
+  
+  p { margin: 0 0 16px; font-size: 14.5px; }
+  
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
   }
-  button{
-    font-family:var(--mono);
-    background:var(--ink);
-    color:var(--paper);
-    border:none;
-    padding:12px 16px;
-    font-size:13.5px;
-    cursor:pointer;
-    border-radius:2px;
-    width:100%;
-    text-align:left;
-    margin-bottom:8px;
-    transition:opacity 0.15s;
+  
+  /* Telemetry & Badges */
+  .contact-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
   }
-  button:hover:not(:disabled){opacity:0.82;}
-  button:disabled{
-    background:var(--line);
-    color:var(--ink-soft);
-    cursor:not-allowed;
+  
+  .confidence {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
   }
-  .role-btn{
-    background:var(--paper-card);
-    color:var(--ink);
-    border:1px solid var(--olive);
-    padding:16px;
-    margin-bottom:12px;
+  .conf-low { background: rgba(245, 158, 11, 0.1); color: #FCD34D; border: 1px solid rgba(245, 158, 11, 0.2); }
+  .conf-medium { background: rgba(249, 115, 22, 0.1); color: #FDBA74; border: 1px solid rgba(249, 115, 22, 0.2); }
+  .conf-high { background: var(--accent-red-dim); color: var(--accent-red-text); border: 1px solid rgba(239, 68, 68, 0.2); }
+  
+  /* Buttons - SaaS Styling */
+  button {
+    font-family: var(--font-sans);
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    width: 100%;
+    margin-bottom: 10px;
+    transition: all 0.2s;
   }
-  .role-btn:hover{background:var(--olive); color:var(--paper);}
-  .role-btn .rname{font-weight:bold; display:block; margin-bottom:4px;}
-  .role-btn .rdesc{font-size:12px; color:var(--ink-soft); font-weight:normal;}
-  .role-btn:hover .rdesc{color:var(--paper);}
-
-  .confidence{
-    display:inline-block;
-    font-size:11px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    padding:3px 9px;
-    border-radius:2px;
-    margin-bottom:12px;
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  /* Action-specific button styling */
+  button[data-action="engage"] {
+    background: var(--accent-red);
+    color: white;
+    border-color: var(--accent-red);
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
   }
-  .conf-low{background:#D8DDCB; color:var(--olive);}
-  .conf-medium{background:#E8D9A8; color:#7A5C1E;}
-  .conf-high{background:#E3B7AE; color:var(--brick);}
-
-  .timerbar-track{
-    height:6px;
-    background:var(--line);
-    border-radius:3px;
-    overflow:hidden;
-    margin-bottom:6px;
+  button[data-action="engage"]:hover:not(:disabled) { background: #B91C1C; }
+  
+  button[data-action="verify"] {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
   }
-  .timerbar-fill{
-    height:100%;
-    background:var(--olive);
-    transition:width 1s linear, background 0.5s;
+  button[data-action="verify"]:hover:not(:disabled) { background: #2563EB; }
+  
+  button[data-action="abort"], button[data-action="escalate"] {
+    background: transparent;
+    border-color: var(--border);
   }
-  .timerlabel{
-    font-size:11px;
-    color:var(--ink-soft);
-    margin-bottom:18px;
+  button[data-action="abort"]:hover:not(:disabled), button[data-action="escalate"]:hover:not(:disabled) {
+    background: #334155;
   }
-  .stale-note{
-    font-size:12px;
-    color:var(--brick);
-    margin-bottom:14px;
+  
+  .startbtn {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+    margin-top: 10px;
   }
-  .contact-tag{
-    font-size:11px;
-    color:var(--ink-soft);
-    margin-bottom:4px;
+  .startbtn:hover { background: #2563EB; }
+  
+  .role-btn {
+    background: var(--bg-card);
+    text-align: left;
+    margin-bottom: 12px;
   }
-  .disclosure{
-    font-size:11.5px;
-    color:var(--ink-soft);
-    border-top:1px solid var(--line);
-    padding-top:14px;
-    margin-top:8px;
+  .role-btn:hover { background: var(--border); }
+  .role-btn .rname { font-weight: 600; display: block; margin-bottom: 4px; color: var(--text-main); }
+  .role-btn .rdesc { font-size: 13px; color: var(--text-muted); font-weight: normal; }
+  
+  .restart { text-align: center; margin-top: 20px; }
+  .restart:hover { background: var(--border); }
+  
+  /* Timer & Progress */
+  .timerbar-track {
+    height: 6px;
+    background: var(--bg-page);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 16px 0 8px;
   }
-  .meter-row{margin-bottom:16px;}
-  .meter-label{
-    display:flex;
-    justify-content:space-between;
-    font-size:12px;
-    margin-bottom:4px;
-    text-transform:uppercase;
-    letter-spacing:0.05em;
-    color:var(--ink-soft);
+  .timerbar-fill {
+    height: 100%;
+    background: var(--accent-blue);
+    transition: width 1s linear, background 0.5s;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
   }
-  .meter-track{
-    height:10px;
-    background:var(--line);
-    border-radius:3px;
-    overflow:hidden;
+  .timerlabel {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
   }
-  .meter-fill{height:100%; border-radius:3px;}
-  .gt-block{
-    border-left:3px solid var(--brick-dim);
-    padding-left:12px;
-    margin-bottom:14px;
+  .stale-note {
+    font-size: 13px;
+    color: var(--accent-red-text);
+    margin-bottom: 16px;
+    font-weight: 500;
   }
-  .gt-title{font-weight:bold; font-size:13px; margin-bottom:4px;}
-  .gt-truth{font-size:13px; color:var(--ink-soft);}
-  .compare-line{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
-  .closing{
-    background:var(--paper-card);
-    border:1px solid var(--line);
-    padding:20px;
-    margin-top:20px;
-    font-size:13.5px;
+  
+  /* Reveals & Debrief */
+  .reveal-note {
+    font-size: 14px;
+    color: var(--text-body);
+    background: rgba(59, 130, 246, 0.1);
+    border-left: 3px solid var(--accent-blue);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border-radius: 0 4px 4px 0;
   }
-  .bignum{font-size:34px; font-weight:bold; color:var(--olive);}
-  .startbtn{background:var(--olive); margin-top:10px;}
-  .restart{background:transparent; border:1px solid var(--ink-soft); color:var(--ink); text-align:center; margin-top:20px;}
+  .reveal-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-blue);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .disclosure {
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 16px;
+  }
+  
+  /* Debrief Meters */
+  .meter-row { margin-bottom: 20px; }
+  .meter-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-main);
+  }
+  .meter-track {
+    height: 8px;
+    background: var(--bg-page);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .meter-fill { height: 100%; border-radius: 4px; }
+  
+  .gt-block {
+    background: var(--bg-card);
+    border-left: 3px solid var(--border);
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 0 6px 6px 0;
+  }
+  .gt-title { font-weight: 600; font-size: 14px; margin-bottom: 6px; color: var(--text-main); }
+  .gt-truth { font-size: 14px; color: var(--text-body); }
+  .compare-line { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+  
+  .bignum { font-size: 36px; font-weight: 600; color: var(--text-main); }
+  
+  /* Loading Overlay */
+  .loading-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(30, 41, 59, 0.9); /* Matches card bg with opacity */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: 8px;
+  }
+  .loading-overlay.active {
+    visibility: visible;
+    opacity: 1;
+  }
+  .loader {
+    border: 3px solid var(--border);
+    border-top: 3px solid var(--accent-blue);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 </style>
 </head>
 <body>
@@ -194,161 +297,195 @@
 <script>
 /* ============ CONFIG ============ */
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbySbcSGjitwnFE3JsSBhm-HPfRMSI5UBbE6S7j8Io3qrYfJu0DkKHS7tKrB6SXQMVcSXA/exec";
-const ROUND_SECONDS = 22;
+const ROUND_SECONDS = 26;
+const VERIFY_TIME_COST = 8;
+const VERIFY_LOADING_MS = 1000;
 
 /* ============ SCENARIO DATA ============ */
-// canonical actions: engage | abort | verify | escalate
 const SCENARIOS = [
   {
-    id:"wrong_read",
-    title:"The Wrong Read",
-    ambiguous:true,
-    confidence:"Medium",
+    id:"wrong_read", title:"The Wrong Read", ambiguous:true, confidence:"Medium",
     text:{
-      operator:"Thermal feed: six heat signatures near the contested road. One appears to be carrying something long and rigid.",
-      commander:"Contact flagged among others this round: six signatures, contested road, possible weapon carry.",
-      release_authority:"System recommendation: ENGAGE — armed unit, six personnel, contested road."
+      operator:"Thermal feed shows six heat signatures moving in loose formation along the contested road, roughly two kilometers from the last recorded skirmish line. One figure appears to be carrying something long and rigid across their shoulders; the others are harder to read at this angle.",
+      commander:"Contact flagged among this round's traffic: six signatures moving along the contested road, one possibly carrying a weapon. No corroborating source yet.",
+      release_authority:"System recommendation: ENGAGE — armed unit, six personnel, moving along the contested road. No secondary confirmation attached."
     },
-    groundTruth:"Farmers moving irrigation pipe. No weapons present.",
-    score:{
-      engage:{ihl:-3,oversight:-2,mission:-1},
-      abort:{ihl:0,oversight:2,mission:0},
-      verify:{ihl:2,oversight:3,mission:1},
-      escalate:{ihl:1,oversight:1,mission:0}
-    }
+    reveal:{
+      operator:"Re-tasking the sensor for a tighter angle: the 'weapon' resolves into a length of PVC pipe. Two of the six are noticeably smaller in frame — possibly minors.",
+      commander:"Additional feed requested: object reclassified as pipe, not a weapon. Two of the six read as smaller-framed, possibly minors.",
+      release_authority:"Supplementary imagery received: object reclassifies as agricultural pipe. Two of the six individuals read as smaller stature, possibly minors."
+    },
+    groundTruth:"Farmers moving irrigation pipe to a field near the road. No weapons present. Two of the six were teenagers helping carry equipment.",
+    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
-    id:"target_tradeoff",
-    title:"Who Pays for the Target",
-    ambiguous:false,
-    confidence:"High",
+    id:"target_tradeoff", title:"Who Pays for the Target", ambiguous:false, confidence:"High",
     text:{
-      operator:"Feed confirms the weapons-facility engineer inside a residential compound. Four additional heat signatures present.",
-      commander:"High-value contact confirmed, residential compound, four additional occupants estimated.",
-      release_authority:"System recommendation: ENGAGE — confirmed HVT, est. 3-5 additional occupants in structure."
+      operator:"Feed confirms the facility engineer inside a residential compound. Four additional heat signatures are present inside the structure, clustered in what looks like a common room.",
+      commander:"High-value contact confirmed: engineer present in residential compound, four additional occupants estimated inside.",
+      release_authority:"System recommendation: ENGAGE — confirmed High-Value Target (HVT), est. 3-5 additional occupants in structure. Confidence: High."
     },
-    groundTruth:"Target confirmed accurate. Two of the four additional occupants were his children.",
-    score:{
-      engage:{ihl:-2,oversight:-1,mission:2},
-      abort:{ihl:1,oversight:1,mission:-2},
-      verify:{ihl:2,oversight:2,mission:1},
-      escalate:{ihl:1,oversight:2,mission:0}
-    }
+    reveal:{
+      operator:"Pulling pattern-of-life data: the four additional signatures have shown up at this address on nine of the last ten evenings. Two read as child-sized on thermal.",
+      commander:"Pattern-of-life check: same four occupants present most evenings this week. Two consistent with child-sized signatures.",
+      release_authority:"Additional context requested: occupancy pattern shows these four present on 9 of 10 recent evenings. Two consistent with child-sized thermal signatures — likely the target's children."
+    },
+    groundTruth:"Target confirmed accurate. Two of the four additional occupants were his children, who were home essentially every evening this week.",
+    score:{ engage:{ihl:-2,oversight:-1,mission:2}, abort:{ihl:1,oversight:1,mission:-2}, verify:{ihl:2,oversight:2,mission:1}, escalate:{ihl:1,oversight:2,mission:0} }
   },
   {
-    id:"too_many_fast",
-    title:"Too Many, Too Fast",
-    ambiguous:true,
-    confidence:"Medium",
+    id:"too_many_fast", title:"Too Many, Too Fast", ambiguous:true, confidence:"Medium",
     text:{
-      operator:"Feed cycling fast across multiple contacts near the supply route. No time to hold on any single frame.",
-      commander:"Three contacts near the supply route, appearing within seconds of each other. One shared window.",
-      release_authority:"Three recommendations queuing near-simultaneously along the supply route."
+      operator:"Feed cycling rapidly across the supply route — three separate contacts within the same eight-second window. No time to settle on any single frame before the next appears.",
+      commander:"Three contacts appearing near the supply route within seconds of each other. Standard single-target review time doesn't apply here.",
+      release_authority:"Three recommendations queuing almost simultaneously along the supply route. Each carries its own confidence score, none yet reviewed."
     },
-    groundTruth:"Two were resupply vehicles. One was a legitimate hostile transport.",
-    score:{
-      engage:{ihl:-2,oversight:-2,mission:-1},
-      abort:{ihl:0,oversight:1,mission:-1},
-      verify:{ihl:2,oversight:3,mission:1},
-      escalate:{ihl:1,oversight:1,mission:0}
-    }
+    reveal:{
+      operator:"Holding the feed on each contact in turn: two show standard cargo-vehicle profiles, unmarked. One shows a profile consistent with a technical — a mounted weapon visible on closer look.",
+      commander:"Slower pass across all three: two read as standard logistics vehicles, one shows a mounted weapon on closer inspection.",
+      release_authority:"Extended review across the three queued recommendations: two match logistics-vehicle profiles, one shows a mounted weapon consistent with a technical."
+    },
+    groundTruth:"Two were resupply vehicles moving routine cargo. One was a legitimate hostile transport, carrying a mounted weapon.",
+    score:{ engage:{ihl:-2,oversight:-2,mission:-1}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   },
   {
-    id:"flying_blind",
-    title:"Flying Blind",
-    ambiguous:true,
-    confidence:"Low",
+    id:"flying_blind", title:"Flying Blind", ambiguous:true, confidence:"Low",
     text:{
-      operator:"Feed freezing. Last clean frame shows a possible contact before the link dropped.",
-      commander:"Asset link degraded. Marked for autonomous fallback if not recalled.",
-      release_authority:"Link degraded. Asset will proceed on last instruction if not recalled. Confidence: Low."
+      operator:"The feed is freezing intermittently. The last clean frame before the link degraded shows a possible contact near the treeline, but there's no way to confirm it from here.",
+      commander:"Asset link has degraded mid-mission. Per standing procedure, it's marked for autonomous fallback unless recalled in the next window.",
+      release_authority:"Link to the asset has degraded. Per its programming, it will proceed on its last instruction if not recalled. Confidence in the last read: Low."
     },
-    groundTruth:"__RANDOM__", // resolved at runtime
-    score:{
-      engage:{ihl:0,oversight:-2,mission:1, random:true}, // "let it proceed"
-      abort:{ihl:0,oversight:2,mission:-1},
-      verify:{ihl:1,oversight:2,mission:0},
-      escalate:{ihl:1,oversight:1,mission:-1}
-    }
+    reveal:{
+      operator:"Attempting to re-establish the link: a partial signal comes through — enough to confirm a contact is present, not enough to classify it.",
+      commander:"Partial reconnection achieved: confirms a contact is present near the treeline. Classification still unavailable.",
+      release_authority:"Partial link re-established: confirms presence of a contact, but classification data did not come through before the connection dropped again."
+    },
+    groundTruth:"__RANDOM__",
+    score:{ engage:{ihl:0,oversight:-2,mission:1, random:true}, abort:{ihl:0,oversight:2,mission:-1}, verify:{ihl:1,oversight:2,mission:0}, escalate:{ihl:1,oversight:1,mission:-1} }
   },
   {
-    id:"decoy_problem",
-    title:"The Decoy Problem",
-    ambiguous:true,
-    confidence:"High",
+    id:"decoy_problem", title:"The Decoy Problem", ambiguous:true, confidence:"High",
     text:{
-      operator:"A clean, textbook signature. Almost too clean, given recent intel on staged decoys in the area.",
-      commander:"Contact reads as high-confidence valid target. Background note: decoy activity reported in sector.",
-      release_authority:"System recommendation: ENGAGE. Confidence: High."
+      operator:"The signature reads clean — almost textbook. Recent intelligence flagged decoy activity in this sector, built specifically to read this way to sensors like this one.",
+      commander:"Contact reads as high-confidence valid target. Sector intel note: decoys have been deployed here recently, designed to mimic this exact signature.",
+      release_authority:"System recommendation: ENGAGE. Confidence: High. Standing sector note flags recent decoy activity designed to produce exactly this reading."
     },
-    groundTruth:"It was a decoy, built specifically to read as high-confidence.",
-    score:{
-      engage:{ihl:-2,oversight:-3,mission:-2},
-      abort:{ihl:1,oversight:1,mission:0},
-      verify:{ihl:2,oversight:3,mission:1},
-      escalate:{ihl:1,oversight:1,mission:0}
-    }
+    reveal:{
+      operator:"Requesting a secondary sensor pass: the thermal signature is almost too uniform — real equipment usually shows more variation. Consistent with known decoy construction.",
+      commander:"Secondary pass requested: signature shows unusually uniform heat distribution, consistent with known decoy rigs in this sector.",
+      release_authority:"Secondary confirmation requested: thermal uniformity is atypically consistent, matching the profile of decoys previously reported in this sector."
+    },
+    groundTruth:"It was a decoy, built specifically to read as high-confidence to sensors like this one.",
+    score:{ engage:{ihl:-2,oversight:-3,mission:-2}, abort:{ihl:1,oversight:1,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
+  },
+  {
+    id:"name_on_list", title:"Name on the List", ambiguous:true, confidence:"Medium",
+    text:{
+      operator:"Facial/ID match returns a name on the target list — a 79% match against the reference photo on file. No live visual confirmation beyond the match itself.",
+      commander:"Watchlist match returned for this contact: 79% confidence against file photo. No independent visual confirmation yet.",
+      release_authority:"System recommendation: ENGAGE — database match, 79% confidence against reference photo. No secondary identification attached."
+    },
+    reveal:{
+      operator:"Cross-checking a second database: the reference photo on file is eleven years old. Match confidence is less reliable against such dated imagery.",
+      commander:"Secondary database check: reference photo is over a decade old. Match confidence is less reliable against aged reference imagery.",
+      release_authority:"Secondary check requested: the reference photo underlying this match is eleven years old. Confidence in aged-photo matches is materially lower than the system's displayed score suggests."
+    },
+    groundTruth:"The match was against an outdated reference photo. The person on-site was misidentified — a relative of the listed individual with a similar build.",
+    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
+  },
+  {
+    id:"the_pattern", title:"The Pattern", ambiguous:true, confidence:"Medium",
+    text:{
+      operator:"No weapon visible, no ID match. The system flags the movement pattern itself — repeated visits to a known storage site, timed near dusk — as consistent with hostile logistics activity.",
+      commander:"Contact flagged on behavior pattern alone: repeated dusk visits to a flagged storage site. No weapon or ID match attached.",
+      release_authority:"System recommendation: ENGAGE — pattern-of-life classification only. No weapon sighted, no identity confirmed. Confidence: Medium."
+    },
+    reveal:{
+      operator:"Widening the observation window: the same pattern — dusk visits to this site — has occurred for the past six weeks, including before the storage site was flagged as hostile-linked.",
+      commander:"Extended history pulled: this movement pattern predates the site's hostile-linked flag by six weeks.",
+      release_authority:"Extended pattern history requested: the behavior in question has recurred for six weeks, including well before the site was flagged as hostile-linked."
+    },
+    groundTruth:"The site is a shared grain store. The pattern was a local resident collecting rations at the same time each evening, unrelated to the site's newer flag.",
+    score:{ engage:{ihl:-3,oversight:-2,mission:-1}, abort:{ihl:0,oversight:2,mission:0}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
+  },
+  {
+    id:"someone_elses_rules", title:"Someone Else's Rules", ambiguous:true, confidence:"Medium",
+    text:{
+      operator:"The recommendation came through a partner-nation feed, not your own. Their targeting system runs on rules of engagement you weren't briefed on in detail.",
+      commander:"Recommendation routed from an allied asset. Their engagement thresholds differ from yours, and the full criteria weren't shared in this handoff.",
+      release_authority:"System recommendation: ENGAGE, sourced from an allied targeting system operating under its own rules of engagement, not fully disclosed in this handoff."
+    },
+    reveal:{
+      operator:"Requesting the underlying criteria from the partner system: their confidence threshold for 'armed' is lower than yours would be for the same sensor data.",
+      commander:"Criteria requested from the partner feed: their bar for classifying a contact as armed sits lower than your own standing threshold.",
+      release_authority:"Underlying criteria requested: the partner system's confidence threshold for this classification is lower than the standard your own command operates under."
+    },
+    groundTruth:"The partner system's recommendation was technically correct under its own rules, which were more permissive than the standard the requesting command normally applies.",
+    score:{ engage:{ihl:-2,oversight:-2,mission:1}, abort:{ihl:1,oversight:1,mission:-1}, verify:{ihl:2,oversight:2,mission:0}, escalate:{ihl:1,oversight:2,mission:0} }
+  },
+  {
+    id:"borrowed_time", title:"Borrowed Time", ambiguous:true, confidence:"Medium",
+    text:{
+      operator:"The asset is on a hard fuel limit — it aborts and returns automatically in under a minute regardless of what you decide. This isn't a system delay. It's the platform's actual limit.",
+      commander:"Asset fuel window closing fast — automatic return-to-base in under a minute, independent of any command input.",
+      release_authority:"Asset operating on a hard fuel limit. Automatic return-to-base is imminent regardless of instruction. This window will not extend."
+    },
+    reveal:{
+      operator:"Checking remaining margin: there's a few extra seconds beyond the displayed countdown, but not enough for a second sensor pass.",
+      commander:"Fuel margin check: slightly more buffer than displayed, but not enough to justify holding for another look.",
+      release_authority:"Margin check requested: a small buffer exists beyond the displayed limit, insufficient for meaningful additional verification."
+    },
+    groundTruth:"__RANDOM__",
+    score:{ engage:{ihl:0,oversight:-1,mission:1, random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:1,oversight:2,mission:0}, escalate:{ihl:1,oversight:1,mission:-1} }
+  },
+  {
+    id:"one_bad_read", title:"One Bad Read", ambiguous:true, confidence:"Medium",
+    text:{
+      operator:"This is the same asset that correctly flagged a real threat two contacts ago. Its confidence score on this new contact is displayed the same way — nothing distinguishes a well-earned read from a lucky one.",
+      commander:"Same asset that scored correctly earlier this mission is now flagging this contact. Confidence display doesn't differentiate track record from this specific read.",
+      release_authority:"System recommendation from the same asset that produced a correct call earlier this mission. Current confidence score carries no indication of whether this specific read is comparably reliable."
+    },
+    reveal:{
+      operator:"Pulling the asset's raw sensor log for this contact specifically: the underlying signal is noticeably weaker than the one behind its earlier correct call.",
+      commander:"Raw signal log requested: this contact's underlying data is weaker than what supported the asset's earlier correct read.",
+      release_authority:"Raw signal data requested for this specific contact: measurably weaker than the data behind the asset's earlier, correct recommendation."
+    },
+    groundTruth:"__RANDOM__",
+    score:{ engage:{ihl:0,oversight:-2,mission:1, random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:2,oversight:3,mission:1}, escalate:{ihl:1,oversight:1,mission:0} }
   }
 ];
 
-// Generic filler contacts for Commander's extra simultaneous targets
 const FILLERS = [
-  {
-    key:"resupply",
-    label:"Unregistered vehicle, logistics route",
-    confidence:"Low",
-    groundTruth:"legit", // always a legitimate resupply vehicle
-    score:{
-      engage:{ihl:-1,oversight:-1,mission:-1},
-      abort:{ihl:0,oversight:1,mission:1},
-      verify:{ihl:1,oversight:1,mission:1}
-    }
-  },
-  {
-    key:"unknown",
-    label:"Unidentified signature, edge of sector",
-    confidence:"Medium",
-    groundTruth:"__RANDOM__",
-    score:{
-      engage:{ihl:0,oversight:0,mission:0,random:true},
-      abort:{ihl:0,oversight:1,mission:-1},
-      verify:{ihl:1,oversight:1,mission:0}
-    }
-  }
+  { key:"resupply", label:"Unregistered vehicle, logistics route", confidence:"Low", groundTruth:"legit",
+    reveal:"Closer look: cargo visible through an open hatch — routine supplies, unmarked truck consistent with prior logistics traffic on this route.",
+    score:{ engage:{ihl:-1,oversight:-1,mission:-1}, abort:{ihl:0,oversight:1,mission:1}, verify:{ihl:1,oversight:1,mission:1} } },
+  { key:"unknown", label:"Unidentified signature, edge of sector", confidence:"Medium", groundTruth:"__RANDOM__",
+    reveal:"Second pass: the shape reads as a light vehicle, holding steady speed. Consistent with both prior harmless traffic and prior hostile traffic in this sector — the extra look narrows it, but doesn't settle it.",
+    score:{ engage:{ihl:0,oversight:0,mission:0,random:true}, abort:{ihl:0,oversight:1,mission:-1}, verify:{ihl:1,oversight:1,mission:0} } }
 ];
 
 const ROLE_INFO = {
-  operator:{
-    name:"Operator",
-    desc:"Hands on the sensor. You see the raw feed directly.",
-    menu:[["Fire","engage"],["Hold","abort"],["Re-task sensor","verify"],["Report up","escalate"]]
-  },
-  commander:{
-    name:"Commander",
-    desc:"Overseeing multiple assets at once. Same clock, more contacts.",
-    menu:[["Engage","engage"],["Abort","abort"],["Hold","verify"]]
-  },
-  release_authority:{
-    name:"Release Authority",
-    desc:"The last human check before a recommendation is acted on.",
-    menu:[["Engage","engage"],["Abort","abort"],["Request more data","verify"],["Escalate to command","escalate"]]
-  }
+  operator:{ name:"Operator", desc:"Hands on the sensor. You see the raw feed directly.",
+    menu:[["Fire","engage"],["Hold","abort"],["Re-task sensor","verify"],["Report up","escalate"]] },
+  commander:{ name:"Commander", desc:"Overseeing multiple assets at once. Same clock, more contacts.",
+    menu:[["Engage","engage"],["Abort","abort"],["Hold","verify"]] },
+  release_authority:{ name:"Release Authority", desc:"The last human check before a recommendation is acted on.",
+    menu:[["Engage","engage"],["Abort","abort"],["Request more data","verify"],["Escalate to command","escalate"]] }
 };
 
 /* ============ STATE ============ */
-let state = {
-  role:null,
-  sessionId:null,
-  roundIndex:0,
-  log:[], // per contact decision records
-  meters:{ihl:50,oversight:50,mission:50},
-  biasCount:0,
-  timer:null,
-  timeLeft:ROUND_SECONDS,
-  stale:false,
-  contactsQueue:[], // for current round, list of {kind:'main'|'filler', scenario/filler, resolved}
-  contactPos:0
-};
+let state = {};
+
+function freshState(){
+  return {
+    role:null, sessionId:null, roundIndex:0, log:[],
+    meters:{ihl:50,oversight:50,mission:50}, biasCount:0,
+    timer:null, timeLeft:ROUND_SECONDS, stale:false,
+    contactsQueue:[], contactPos:0,
+    currentRevealed:false, usedVerifyThisContact:false,
+    isVerifying:false 
+  };
+}
 
 function uid(){
   return (crypto.randomUUID ? crypto.randomUUID() : ("s"+Math.random().toString(36).slice(2)+Date.now()));
@@ -378,7 +515,7 @@ async function fetchAggregate(){
 const app = document.getElementById("app");
 
 function eyebrow(right){
-  return `<div class="eyebrow"><span>SIGN-OFF</span><span>${right||""}</span></div>`;
+  return `<div class="eyebrow"><span>System Initialization</span><span>${right||"Status: Nominal"}</span></div>`;
 }
 
 function confBadge(level){
@@ -389,14 +526,44 @@ function confBadge(level){
 /* ============ SCREEN: INTRO ============ */
 function renderIntro(){
   app.innerHTML = `
-    ${eyebrow("BRIEFING")}
+    ${eyebrow("Session Details")}
     <h1>Sign-Off</h1>
     <div class="card">
       <p>Militaries now use AI to sift sensor data and recommend targets. On paper, nothing gets engaged without a human sign-off — an officer reviews the recommendation before it's acted on.</p>
       <p>This isn't theoretical. Decision-support systems already coordinate real strikes. What that human sign-off actually requires — beyond a person nominally present — is still unresolved, from individual operators up to the bodies trying to govern these systems.</p>
-      <p>Five scenarios. You'll pick a seat in the chain of command. The system will give you a recommendation and a confidence level. The clock runs regardless.</p>
-      <button class="startbtn" onclick="goToRoleSelect()">Begin</button>
+      <p>Ten scenarios. You'll pick a seat in the chain of command. The system will give you a recommendation and a confidence level. The clock runs regardless.</p>
+      <button class="startbtn" onclick="renderLawBrief()">Begin</button>
       <div class="disclosure">Your decisions are logged anonymously for research on how people interact with AI-assisted targeting recommendations.</div>
+      
+      <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
+        <img src="image_265385.png" alt="Takshashila Institution Logo" style="max-height: 80px; margin-bottom: 12px;">
+        <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+          A work in progress project by the Takshashila Institution
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============ SCREEN: IHL / GGE BRIEF ============ */
+function renderLawBrief(){
+  app.innerHTML = `
+    ${eyebrow("Legal Framework Parameters")}
+    <h1>Before you start</h1>
+    <div class="card">
+      <h3>What already applies</h3>
+      <p>International Humanitarian Law (IHL) governs this, autonomous or not. Three principles do most of the work: distinction — separating combatants from civilians; proportionality — weighing expected military advantage against expected civilian harm; and precaution — taking feasible steps to verify before acting. None were written with AI in mind. Nothing about AI exempts a state from them.</p>
+
+      <h3>What states have agreed on so far</h3>
+      <p>Since 2017, a United Nations-mandated Group of Governmental Experts (GGE), under the Convention on Certain Conventional Weapons (CCW), has been negotiating what more is needed. In 2019 it adopted a set of guiding principles: International Humanitarian Law (IHL) applies in full, human responsibility for the use of force cannot be delegated to a machine, and risk mitigation has to be built into a system's design from the start.</p>
+
+      <h3>Where it's stuck</h3>
+      <p>The unresolved fight is over what "human responsibility" actually requires in practice. Heading into the Convention on Certain Conventional Weapons (CCW) Seventh Review Conference in November 2026, most delegations want binding language requiring "meaningful human control" or "context-appropriate human judgment" across a weapon's full lifecycle. The United States has consistently opposed fixed thresholds, proposing looser standards instead — most recently "good faith human judgement and care," rather than a defined bar every system has to clear. The International Committee of the Red Cross (ICRC) and the UN Secretary-General have jointly called for a binding instrument by the end of 2026. Whether that happens is still open.</p>
+
+      <h3>Why this matters here</h3>
+      <p>Every system in this simulation claims a human is responsible for the outcome. What that responsibility is worth in practice is what you're about to test.</p>
+
+      <button class="startbtn" onclick="goToRoleSelect()">Continue</button>
     </div>
   `;
 }
@@ -404,9 +571,9 @@ function renderIntro(){
 /* ============ SCREEN: ROLE SELECT ============ */
 function goToRoleSelect(){
   app.innerHTML = `
-    ${eyebrow("ASSIGNMENT")}
+    ${eyebrow("Authority Selection")}
     <h1>Choose your seat</h1>
-    <p>Same five incidents. Different vantage point.</p>
+    <p>Same incidents. Different vantage point.</p>
     ${Object.entries(ROLE_INFO).map(([key,info])=>`
       <button class="role-btn" onclick="startSession('${key}')">
         <span class="rname">${info.name}</span>
@@ -418,19 +585,9 @@ function goToRoleSelect(){
 
 /* ============ SESSION START ============ */
 function startSession(role){
-  state = {
-    role,
-    sessionId: uid(),
-    roundIndex: 0,
-    log: [],
-    meters:{ihl:50,oversight:50,mission:50},
-    biasCount:0,
-    timer:null,
-    timeLeft:ROUND_SECONDS,
-    stale:false,
-    contactsQueue:[],
-    contactPos:0
-  };
+  state = freshState();
+  state.role = role;
+  state.sessionId = uid();
   loadRound(0);
 }
 
@@ -441,17 +598,18 @@ function loadRound(idx){
   const scenario = SCENARIOS[idx];
   const queue = [{kind:"main", scenario}];
   if(state.role === "commander"){
-    // add 1-2 filler contacts, shuffled position
     const shuffled = [...FILLERS];
     if(idx % 2 === 0){ queue.push({kind:"filler", filler: shuffled[0]}); }
     else { queue.push({kind:"filler", filler: shuffled[1]}); queue.push({kind:"filler", filler: shuffled[0]}); }
-    // randomize order but keep track
     queue.sort(()=>Math.random()-0.5);
   }
   state.contactsQueue = queue;
   state.contactPos = 0;
   state.timeLeft = ROUND_SECONDS;
   state.stale = false;
+  state.currentRevealed = false;
+  state.usedVerifyThisContact = false;
+  state.isVerifying = false;
   renderContact();
   startTimer();
 }
@@ -459,6 +617,8 @@ function loadRound(idx){
 function startTimer(){
   clearInterval(state.timer);
   state.timer = setInterval(()=>{
+    if(state.isVerifying) return; 
+
     state.timeLeft -= 1;
     if(state.timeLeft <= 0){
       state.timeLeft = 0;
@@ -476,10 +636,9 @@ function updateTimerUI(){
   if(!fill) return;
   const pct = Math.max(0,(state.timeLeft/ROUND_SECONDS)*100);
   fill.style.width = pct+"%";
-  fill.style.background = pct>40 ? "var(--olive)" : "var(--brick)";
-  if(label) label.textContent = state.stale ? "Window closed" : `${state.timeLeft}s`;
+  fill.style.background = pct>30 ? "var(--accent-blue)" : "var(--accent-red)";
+  if(label) label.textContent = state.stale ? "TIME EXPIRED" : `T-MINUS ${state.timeLeft}.0s`;
   if(staleNote) staleNote.style.display = state.stale ? "block":"none";
-  // disable verify-type buttons if stale
   document.querySelectorAll("[data-action='verify']").forEach(b=>{
     if(state.stale) b.disabled = true;
   });
@@ -491,38 +650,76 @@ function renderContact(){
   const roleInfo = ROLE_INFO[state.role];
   const totalRounds = SCENARIOS.length;
   const contactTag = state.contactsQueue.length>1
-    ? `<div class="contact-tag">Contact ${state.contactPos+1} of ${state.contactsQueue.length}</div>` : "";
+    ? `<div class="contact-tag">QUEUE: CONTACT ${state.contactPos+1} OF ${state.contactsQueue.length}</div>` : "";
 
-  let bodyText, confidence, title;
+  let bodyText, confidence, revealText;
   if(item.kind === "main"){
-    title = item.scenario.title;
     bodyText = item.scenario.text[state.role];
     confidence = item.scenario.confidence;
+    revealText = item.scenario.reveal[state.role];
   } else {
-    title = "Unresolved contact";
     bodyText = item.filler.label;
     confidence = item.filler.confidence;
+    revealText = item.filler.reveal || null;
   }
 
-  const menuButtons = roleInfo.menu.map(([label,action])=>
-    `<button data-action="${action}" onclick="handleDecision('${action}')">${label}</button>`
-  ).join("");
+  let menuEntries = roleInfo.menu;
+  if(state.currentRevealed){
+    menuEntries = roleInfo.menu.filter(([label,action]) => action !== "verify");
+  }
+  const menuButtons = menuEntries.map(([label,action])=>{
+    const handler = action === "verify" ? `triggerVerify()` : `handleDecision('${action}')`;
+    return `<button data-action="${action}" onclick="${handler}">${label}</button>`;
+  }).join("");
+
+  const revealBlock = (state.currentRevealed && revealText) ? `
+    <div class="reveal-note">
+      <span class="reveal-tag">Telemetry / Additional Data</span>
+      ${revealText}
+    </div>
+  ` : "";
+
+  const loaderOverlay = `
+    <div id="verifyLoader" class="loading-overlay ${state.isVerifying ? 'active' : ''}">
+      <div class="loader"></div>
+    </div>
+  `;
 
   app.innerHTML = `
-    ${eyebrow(`SCENARIO ${state.roundIndex+1} / ${totalRounds}`)}
-    <h2>${roleInfo.name}</h2>
+    ${eyebrow(`SCENARIO 0${state.roundIndex+1} // 10`)}
+    <h2>${roleInfo.name} Review</h2>
     <div class="card">
-      ${contactTag}
-      <div class="stamp">${title}</div>
-      ${confBadge(confidence)}
-      <p>${bodyText}</p>
-      <div class="timerbar-track"><div class="timerbar-fill" id="timerfill" style="width:100%"></div></div>
-      <div class="timerlabel" id="timerlabel">${ROUND_SECONDS}s</div>
-      <div class="stale-note" id="staleNote" style="display:none;">Window closed — data is now stale. Decide on what you have.</div>
-      ${menuButtons}
+      ${loaderOverlay}
+      <div id="cardContent" style="${state.isVerifying ? 'visibility:hidden' : ''}">
+        ${contactTag}
+        ${confBadge(confidence)}
+        <p>${bodyText}</p>
+        ${revealBlock}
+        <div class="timerbar-track"><div class="timerbar-fill" id="timerfill" style="width:100%"></div></div>
+        <div class="timerlabel" id="timerlabel">T-MINUS ${ROUND_SECONDS}.0s</div>
+        <div class="stale-note" id="staleNote" style="display:none;">Window closed — telemetry is stale. Force final decision.</div>
+        ${menuButtons}
+      </div>
     </div>
   `;
   updateTimerUI();
+}
+
+/* ============ VERIFY (REVEAL) ============ */
+function triggerVerify(){
+  if(state.currentRevealed || state.stale || state.isVerifying) return;
+  
+  state.isVerifying = true;
+  renderContact(); 
+
+  setTimeout(() => {
+    state.isVerifying = false;
+    state.currentRevealed = true;
+    state.usedVerifyThisContact = true;
+    state.timeLeft = Math.max(0, state.timeLeft - VERIFY_TIME_COST);
+    if(state.timeLeft === 0) state.stale = true;
+    renderContact();
+  }, VERIFY_LOADING_MS);
 }
 
 /* ============ DECISION HANDLING ============ */
@@ -533,15 +730,18 @@ function resolveFillerGroundTruth(filler){
 function resolveScenarioGroundTruth(scenario){
   if(scenario.groundTruth === "__RANDOM__"){
     return Math.random()<0.5
-      ? "Autonomous fallback engaged correctly — contact was hostile."
-      : "Autonomous fallback engaged in error — contact was not hostile.";
+      ? "It proceeded correctly on its own — the contact was hostile."
+      : "It proceeded in error — the contact was not hostile.";
   }
   return scenario.groundTruth;
 }
 
 function handleDecision(action){
+  if(state.isVerifying) return; 
+
   const item = state.contactsQueue[state.contactPos];
   let ihl=0, oversight=0, mission=0, ambiguous=false, confidence, scenarioId, groundTruth, biasFlag=false;
+  const usedVerify = state.usedVerifyThisContact;
 
   if(item.kind === "main"){
     const sc = item.scenario;
@@ -552,7 +752,8 @@ function handleDecision(action){
     ihl = s.ihl; oversight = s.oversight; mission = s.mission;
     groundTruth = resolveScenarioGroundTruth(sc);
     if(s.random && groundTruth.includes("error")){ ihl-=3; oversight-=1; mission-=2; }
-    biasFlag = (ambiguous && action==="engage" && (confidence==="Medium"||confidence==="High"));
+    biasFlag = (ambiguous && action==="engage" && !usedVerify && (confidence==="Medium"||confidence==="High"));
+    if(usedVerify){ ihl += 1; oversight += 2; }
   } else {
     const f = item.filler;
     scenarioId = "filler_"+f.key;
@@ -563,7 +764,8 @@ function handleDecision(action){
     const gt = resolveFillerGroundTruth(f);
     groundTruth = gt;
     if(s.random && gt==="false_alarm" && action==="engage"){ ihl-=2; oversight-=1; mission-=1; }
-    biasFlag = (action==="engage" && (confidence==="Medium"||confidence==="High"));
+    biasFlag = (action==="engage" && !usedVerify && (confidence==="Medium"||confidence==="High"));
+    if(usedVerify){ ihl += 1; oversight += 2; }
   }
 
   state.meters.ihl += ihl;
@@ -572,34 +774,22 @@ function handleDecision(action){
   if(biasFlag) state.biasCount += 1;
 
   state.log.push({
-    scenario_id: scenarioId,
-    contact_index: state.contactPos,
-    ai_confidence: confidence,
-    decision: action,
-    waited_for_pressure: state.stale,
-    was_ambiguous: ambiguous,
-    automation_bias_flag: biasFlag,
-    ihl_outcome: ihl,
-    ground_truth: groundTruth
+    scenario_id: scenarioId, contact_index: state.contactPos, ai_confidence: confidence,
+    decision: action, used_verify: usedVerify, waited_for_pressure: state.stale,
+    was_ambiguous: ambiguous, automation_bias_flag: biasFlag, ihl_outcome: ihl, ground_truth: groundTruth
   });
 
   postData({
-    type:"round",
-    session_id: state.sessionId,
-    role: state.role,
-    scenario_id: scenarioId,
-    contact_index: state.contactPos,
-    ai_confidence: confidence,
-    decision: action,
-    waited_for_pressure: state.stale,
-    was_ambiguous: ambiguous,
-    automation_bias_flag: biasFlag,
-    ihl_outcome: ihl,
-    ground_truth: groundTruth
+    type:"round", session_id: state.sessionId, role: state.role, scenario_id: scenarioId,
+    contact_index: state.contactPos, ai_confidence: confidence, decision: action, used_verify: usedVerify,
+    waited_for_pressure: state.stale, was_ambiguous: ambiguous, automation_bias_flag: biasFlag,
+    ihl_outcome: ihl, ground_truth: groundTruth
   });
 
-  // advance
   state.contactPos += 1;
+  state.currentRevealed = false;
+  state.usedVerifyThisContact = false;
+
   if(state.contactPos < state.contactsQueue.length){
     renderContact();
   } else if(state.roundIndex + 1 < SCENARIOS.length){
@@ -620,25 +810,20 @@ async function finishSession(){
   };
 
   postData({
-    type:"session",
-    session_id: state.sessionId,
-    role: state.role,
-    ihl_compliance: meters.ihl,
-    oversight_retained: meters.oversight,
-    mission_success: meters.mission,
-    automation_bias_count: state.biasCount,
-    scenarios_completed: SCENARIOS.length
+    type:"session", session_id: state.sessionId, role: state.role,
+    ihl_compliance: meters.ihl, oversight_retained: meters.oversight, mission_success: meters.mission,
+    automation_bias_count: state.biasCount, scenarios_completed: SCENARIOS.length
   });
 
-  app.innerHTML = `${eyebrow("DEBRIEF")}<h1>Compiling results…</h1><p>Pulling comparison data.</p>`;
+  app.innerHTML = `${eyebrow("SYSTEM DEBRIEF")}<h1>Compiling results…</h1><p>Pulling comparison data.</p>`;
   const agg = await fetchAggregate();
   renderDebrief(meters, agg);
 }
 
 function meterColor(v){
-  if(v>=66) return "var(--olive)";
-  if(v>=40) return "var(--olive-dim)";
-  return "var(--brick)";
+  if(v>=66) return "var(--accent-blue)";
+  if(v>=40) return "#94A3B8"; 
+  return "var(--accent-red)";
 }
 
 function renderDebrief(meters, agg){
@@ -661,7 +846,7 @@ function renderDebrief(meters, agg){
     }
     return `
       <div class="gt-block">
-        <div class="gt-title">${sc.title} — you chose: ${r.decision}${r.waited_for_pressure ? " (after window closed)":""}</div>
+        <div class="gt-title">${sc.title} — you chose: ${r.decision.toUpperCase()}${r.used_verify ? " (after requesting more detail)":""}${r.waited_for_pressure ? " (window closed)":""}</div>
         <div class="gt-truth">Actually: ${r.groundTruth}</div>
         ${compareLine}
       </div>
@@ -669,29 +854,29 @@ function renderDebrief(meters, agg){
   }).join("");
 
   app.innerHTML = `
-    ${eyebrow("DEBRIEF")}
+    ${eyebrow("System Debrief")}
     <h1>Sign-Off complete</h1>
     <p>Role played: ${ROLE_INFO[state.role].name}</p>
     <div class="card">
-      ${meterHTML("IHL compliance (distinction / proportionality / precaution)", meters.ihl)}
+      ${meterHTML("International Humanitarian Law (IHL) compliance", meters.ihl)}
       ${meterHTML("Oversight retained", meters.oversight)}
       ${meterHTML("Mission outcome", meters.mission)}
-      <div class="meter-row">
-        <div class="meter-label"><span>Automation bias reading</span></div>
-        <div class="bignum">${state.biasCount} / 5</div>
-        <p style="margin-top:6px; font-size:12.5px; color:var(--ink-soft);">Times you followed a medium-or-high-confidence recommendation without asking for more information, in a scenario built to be ambiguous.</p>
+      <div class="meter-row" style="margin-top:32px;">
+        <div class="meter-label" style="color:var(--accent-red-text);"><span>Automation bias reading</span></div>
+        <div class="bignum">${state.biasCount} / ${SCENARIOS.length}</div>
+        <p style="margin-top:6px; font-size:13px; color:var(--text-muted);">Times you followed a medium-or-high-confidence recommendation without requesting more detail first, in a scenario built to be ambiguous.</p>
       </div>
     </div>
 
     <h2>What actually happened</h2>
     ${gtHTML}
 
-    <div class="closing">
+    <div class="card" style="margin-top: 32px; border-color: var(--border);">
       <p>This isn't hypothetical. Project Maven coordinated targeting behind real strikes, including one that hit a school in Minab and killed as many as 180 people. Systems like Lavender have been used to help select targets in Gaza, with officers reportedly treating machine recommendations as close to verified fact.</p>
-      <p>Every recommendation in this simulation had a human sign-off built in — the same guarantee these real systems claim. What you just experienced is why that guarantee is often thinner than it sounds: trusting a fast, confident-looking system over your own slower judgment is the easier choice, and it feels rational in the moment. That tendency has a name, automation bias, and systems like these are built assuming you have it.</p>
+      <p style="margin-bottom:0;">Every recommendation in this simulation had a human sign-off built in — the same guarantee these real systems claim. What you just experienced is why that guarantee is often thinner than it sounds: trusting a fast, confident-looking system over your own slower judgment is the easier choice, and it feels rational in the moment. That tendency has a name, automation bias, and systems like these are built assuming you have it.</p>
     </div>
 
-    <button class="restart" onclick="renderIntro()">Run it again</button>
+    <button class="restart" onclick="renderIntro()">Run Simulation Again</button>
   `;
 }
 
