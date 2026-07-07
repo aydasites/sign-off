@@ -33,7 +33,7 @@
     font-family: var(--font-sans);
     min-height: 100vh;
     line-height: 1.6;
-    user-select: none; /* Prevents text selection during hold interactions */
+    user-select: none;
   }
   
   #app {
@@ -112,6 +112,25 @@
   .conf-medium { background: rgba(249, 115, 22, 0.1); color: #FDBA74; border: 1px solid rgba(249, 115, 22, 0.2); }
   .conf-high { background: var(--accent-red-dim); color: var(--accent-red-text); border: 1px solid rgba(239, 68, 68, 0.2); }
   
+  /* Demo Diagnostic Hints */
+  .diagnostic-bubble {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px dashed rgba(59, 130, 246, 0.4);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+    color: #93C5FD;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .diagnostic-bubble span {
+    font-family: var(--font-mono);
+    font-weight: bold;
+    color: var(--accent-blue);
+  }
+
   /* Buttons - SaaS Styling */
   button {
     font-family: var(--font-sans);
@@ -129,7 +148,6 @@
   }
   button:disabled { opacity: 0.5; cursor: not-allowed; }
   
-  /* Action-specific button styling */
   button[data-action="verify"] {
     background: var(--accent-blue);
     color: white;
@@ -181,7 +199,7 @@
     position: absolute; 
     top: 0; left: 0; bottom: 0; 
     width: 0%; 
-    background: rgba(0,0,0,0.35); /* Darkens the red as it fills */
+    background: rgba(0,0,0,0.35);
     z-index: 1; 
   }
   .hold-text { 
@@ -570,7 +588,6 @@ function renderIntro(){
       <button class="startbtn" onclick="renderLawBrief()">Begin</button>
       <div class="disclosure">Your decisions are logged anonymously for research on how people interact with AI-assisted targeting recommendations.</div>
       
-      <!-- Takshashila Branding -->
       <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
         <img src="image_265385.png" alt="Takshashila Institution Logo" style="max-height: 80px; margin-bottom: 12px;">
         <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
@@ -596,50 +613,29 @@ function renderLawBrief(){
       <h3>Where it's stuck</h3>
       <p>The unresolved fight is over what "human responsibility" actually requires in practice. Heading into the Convention on Certain Conventional Weapons (CCW) Seventh Review Conference in November 2026, most delegations want binding language requiring "meaningful human control" or "context-appropriate human judgment" across a weapon's full lifecycle. The United States has consistently opposed fixed thresholds, proposing looser standards instead — most recently "good faith human judgement and care," rather than a defined bar every system has to clear. The International Committee of the Red Cross (ICRC) and the UN Secretary-General have jointly called for a binding instrument by the end of 2026. Whether that happens is still open.</p>
 
-      <h3>Why this matters here</h3>
-      <p>Every system in this simulation claims a human is responsible for the outcome. What that responsibility is worth in practice is what you're about to test.</p>
-
-      <button class="startbtn" onclick="goToRoleSelect()">Continue</button>
+      <button class="startbtn" onclick="startDemo()">Enter Training Module</button>
     </div>
   `;
 }
 
-/* ============ SCREEN: ROLE SELECT ============ */
-function goToRoleSelect(){
-  app.innerHTML = `
-    ${eyebrow("Authority Selection")}
-    <h1>Choose your seat</h1>
-    <p>Same incidents. Different vantage point.</p>
-    ${Object.entries(ROLE_INFO).map(([key,info])=>`
-      <button class="role-btn" onclick="startDemo('${key}')">
-        <span class="rname">${info.name}</span>
-        <span class="rdesc">${info.desc}</span>
-      </button>
-    `).join("")}
-  `;
-}
-
 /* ============ DEMO / TRAINING MODULE ============ */
-function startDemo(role){
+function startDemo(){
   state = freshState();
-  state.role = role;
-  state.sessionId = uid();
   state.isDemo = true;
-  
   state.contactsQueue = [{
     kind:"main",
     scenario:{
       id: "demo",
       confidence:"High",
       text:{
-        operator: "TRAINING MODULE: This is a practice scenario. Watch the timer above. Test the 'Request More Data' button to see how it costs time, then practice holding the 'Hold to Authorize' button to clear this screen.",
-        commander: "TRAINING MODULE: This is a practice scenario. Watch the timer above. Test the 'Request More Data' button to see how it costs time, then practice holding the 'Hold to Authorize' button to clear this screen.",
-        release_authority: "TRAINING MODULE: This is a practice scenario. Watch the timer above. Test the 'Request More Data' button to see how it costs time, then practice holding the 'Hold to Authorize' button to clear this screen."
+        operator: "TRAINING MODULE: This is a safe testing sandbox. Hover your cursor over 'Request More Data' or the action keys below to observe system diagnostic tags. Practice modifying your parameters before deploying.",
+        commander: "TRAINING MODULE: This is a safe testing sandbox. Hover your cursor over 'Request More Data' or the action keys below to observe system diagnostic tags. Practice modifying your parameters before deploying.",
+        release_authority: "TRAINING MODULE: This is a safe testing sandbox. Hover your cursor over 'Request More Data' or the action keys below to observe system diagnostic tags. Practice modifying your parameters before deploying."
       },
       reveal:{
-        operator: "Data revealed. Notice the timer dropped by 8 seconds. Make a final decision to begin the live simulation.",
-        commander: "Data revealed. Notice the timer dropped by 8 seconds. Make a final decision to begin the live simulation.",
-        release_authority: "Data revealed. Notice the timer dropped by 8 seconds. Make a final decision to begin the live simulation."
+        operator: "Secondary check logged successfully. Notice that requesting context triggered a 1-second visual buffer and immediately deducted 8.0s from your main review clock. Test the authorization or hold keys to proceed.",
+        commander: "Secondary check logged successfully. Notice that requesting context triggered a 1-second visual buffer and immediately deducted 8.0s from your main review clock. Test the authorization or hold keys to proceed.",
+        release_authority: "Secondary check logged successfully. Notice that requesting context triggered a 1-second visual buffer and immediately deducted 8.0s from your main review clock. Test the authorization or hold keys to proceed."
       },
       groundTruth: "This was a training simulation.",
       score: { engage:{ihl:0,oversight:0,mission:0}, abort:{ihl:0,oversight:0,mission:0}, verify:{ihl:0,oversight:0,mission:0}, escalate:{ihl:0,oversight:0,mission:0} }
@@ -651,6 +647,28 @@ function startDemo(role){
   startTimer();
 }
 
+/* ============ SCREEN: ROLE SELECT ============ */
+function goToRoleSelect(){
+  app.innerHTML = `
+    ${eyebrow("Authority Selection")}
+    <h1>Choose your seat</h1>
+    <p>Same incidents. Different vantage point. Select your role deployment to begin the live tracking sequence.</p>
+    ${Object.entries(ROLE_INFO).map(([key,info])=>`
+      <button class="role-btn" onclick="startSession('${key}')">
+        <span class="rname">${info.name}</span>
+        <span class="rdesc">${info.desc}</span>
+      </button>
+    `).join("")}
+  `;
+}
+
+/* ============ SESSION START ============ */
+function startSession(role){
+  state = freshState();
+  state.role = role;
+  state.sessionId = uid();
+  loadRound(0);
+}
 
 /* ============ ROUND / CONTACT SETUP ============ */
 function loadRound(idx){
@@ -745,14 +763,18 @@ function stopHold(action) {
 /* ============ RENDER CONTACT ============ */
 function renderContact(){
   const item = state.contactsQueue[state.contactPos];
-  const roleInfo = ROLE_INFO[state.role];
+  const roleInfo = state.isDemo ? { name: "Training Officer", menu: [["Hold / Abort", "abort"], ["Request More Data", "verify"], ["Hold to Authorize", "engage"]] } : ROLE_INFO[state.role];
   const totalRounds = state.isDemo ? 1 : SCENARIOS.length;
-  const roundLabel = state.isDemo ? "TRAINING MODULE" : `SCENARIO 0${state.roundIndex+1} // ${totalRounds}`;
+  const roundLabel = state.isDemo ? "TRAINING OVERLAY" : `SCENARIO 0${state.roundIndex+1} // ${totalRounds}`;
   const contactTag = state.contactsQueue.length>1
     ? `<div class="contact-tag">QUEUE: CONTACT ${state.contactPos+1} OF ${state.contactsQueue.length}</div>` : "";
 
   let bodyText, confidence, revealText;
-  if(item.kind === "main"){
+  if(state.isDemo) {
+    bodyText = item.scenario.text.operator;
+    confidence = item.scenario.confidence;
+    revealText = item.scenario.reveal.operator;
+  } else if(item.kind === "main"){
     bodyText = item.scenario.text[state.role];
     confidence = item.scenario.confidence;
     revealText = item.scenario.reveal[state.role];
@@ -762,13 +784,21 @@ function renderContact(){
     revealText = item.filler.reveal || null;
   }
 
-  let menuEntries = roleInfo.menu;
-  if(state.currentRevealed){
-    menuEntries = roleInfo.menu.filter(([label,action]) => action !== "verify");
-  }
-  const menuButtons = menuEntries.map(([label,action])=>{
+  // Diagnostic hints for the demo sandbox
+  let timerDiagnostic = state.isDemo ? `<div class="diagnostic-bubble"><span>[DIAGNOSTIC 01]</span> Countdown tracking bar. If this expires completely, your options freeze and you must choose based strictly on initial data.</div>` : "";
+  
+  let menuButtons = roleInfo.menu.map(([label,action])=>{
+    if(state.currentRevealed && action === "verify") return ""; // filter out verify if already revealed
+
+    let diagnosticTag = "";
+    if(state.isDemo) {
+      if(action === "engage") diagnosticTag = `<div class="diagnostic-bubble"><span>[DIAGNOSTIC 04]</span> High-friction key. Requires a persistent 1.5s hold parameter to avoid automated misfires. Activates recommendation.</div>`;
+      if(action === "abort") diagnosticTag = `<div class="diagnostic-bubble"><span>[DIAGNOSTIC 02]</span> Standard exit key. Safely dismisses the target packet and jumps execution parameters to the next asset in line.</div>`;
+      if(action === "verify") diagnosticTag = `<div class="diagnostic-bubble"><span>[DIAGNOSTIC 03]</span> Context extension key. Queries internal networks for sensor clarity but enforces a mandatory -8.0s operational penalty penalty.</div>`;
+    }
+
     if(action === "engage") {
-      return `<button data-action="${action}" class="hold-btn" 
+      return `${diagnosticTag}<button data-action="${action}" class="hold-btn" 
                onmousedown="startHold('${action}')" 
                onmouseup="stopHold('${action}')" 
                onmouseleave="stopHold('${action}')" 
@@ -779,7 +809,7 @@ function renderContact(){
              </button>`;
     }
     const handler = action === "verify" ? `triggerVerify()` : `handleDecision('${action}')`;
-    return `<button data-action="${action}" onclick="${handler}">${label}</button>`;
+    return `${diagnosticTag}<button data-action="${action}" onclick="${handler}">${label}</button>`;
   }).join("");
 
   const revealBlock = (state.currentRevealed && revealText) ? `
@@ -805,6 +835,7 @@ function renderContact(){
         ${confBadge(confidence)}
         <p>${bodyText}</p>
         ${revealBlock}
+        ${timerDiagnostic}
         <div class="timerbar-track"><div class="timerbar-fill" id="timerfill" style="width:100%"></div></div>
         <div class="timerlabel" id="timerlabel">T-MINUS ${ROUND_SECONDS}.0s</div>
         <div class="stale-note" id="staleNote" style="display:none;">Window closed — telemetry is stale. Force final decision.</div>
@@ -884,8 +915,15 @@ function handleDecision(action){
 
   if(state.isDemo) {
       clearInterval(state.timer);
-      state.isDemo = false;
-      loadRound(0);
+      app.innerHTML = `
+        ${eyebrow("Training Module Clear")}
+        <h1>System Diagnostics Configured</h1>
+        <div class="card">
+          <p>Training tracking sequence finalized. Sandbox protocols are now disengaged.</p>
+          <p>You are ready to enter the active chain of command. Be advised that your review clock operates under live constraints and actions cannot be undone.</p>
+          <button class="startbtn" onclick="goToRoleSelect()">Deploy to Chain of Command</button>
+        </div>
+      `;
       return;
   }
 
@@ -949,7 +987,7 @@ function handleDecision(action){
   state.contactPos += 1;
   state.currentRevealed = false;
   state.usedVerifyThisContact = false;
-  state.totalHoverTime = 0; // reset for next contact
+  state.totalHoverTime = 0;
 
   if(state.contactPos < state.contactsQueue.length){
     renderContact();
@@ -1027,7 +1065,6 @@ function renderDebrief(meters, agg){
       ${meterHTML("Oversight retained", meters.oversight)}
       ${meterHTML("Mission outcome", meters.mission)}
       
-      <!-- Score Context -->
       <div style="font-size: 13px; color: var(--text-muted); margin: 16px 0; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 6px;">
         <strong>How this is calculated:</strong><br>
         • <em>IHL Compliance:</em> Decreases when you authorize strikes on civilians or decoys.<br>
